@@ -15,14 +15,4 @@ Kişisel İngilizce çalışma alanı — kelime kartları, aralıklı tekrar (s
 
 - React 19 + TypeScript + Vite, Tailwind CSS
 - PWA desteği (`vite-plugin-pwa`)
-- Node/Express API + SQLite (`node:sqlite`) — veriler tarayıcıya değil diskteki veritabanına kaydedilir
-
-## Kurulum
-
-```bash
-npm install
-cp .env.example .env
-npm run dev
-```
-
-Uygulama `http://localhost:5173`, API `http://localhost:5175` üzerinde çalışır.
+- Node/Express API + SQLite (`node:sqlite`)
