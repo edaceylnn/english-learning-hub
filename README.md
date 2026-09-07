@@ -1,32 +1,28 @@
-# React + TypeScript + Vite
+# English Learning Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Kişisel İngilizce çalışma alanı — kelime kartları, aralıklı tekrar (spaced repetition), mini oyunlar, ders notları, yapılacaklar listesi ve istatistikleri tek bir panelde toplar.
 
-Currently, two official plugins are available:
+## Özellikler
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Kelimeler** — kelime/anlam/örnek cümle ekleme, etiketleme, toplu ekleme
+- **Kelime Tekrarı** — aralıklı tekrar algoritmasıyla günlük tekrar akışı
+- **Oyun** — Quiz, Typing, Cloze ve Matching modlarıyla pratik
+- **Notlar & Ders Notları** — serbest notlar ve ders bazlı kayıtlar
+- **Yapılacaklar & Takvim** — görev ve ders takibi
+- **İstatistikler** — ilerleme grafikleri
 
-## React Compiler
+## Teknolojiler
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript + Vite, Tailwind CSS
+- PWA desteği (`vite-plugin-pwa`)
+- Node/Express API + SQLite (`node:sqlite`) — veriler tarayıcıya değil diskteki veritabanına kaydedilir
 
-## Expanding the Oxlint configuration
+## Kurulum
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+cp .env.example .env
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Uygulama `http://localhost:5173`, API `http://localhost:5175` üzerinde çalışır.
