@@ -1,20 +1,22 @@
-import { useRef, useState } from 'react';
-import { Heart, RotateCcw, Zap } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { emptyWordsHint, findSynonyms, normalizeText } from '../../lib/gameWords';
 import { START_LIVES, useGameRound } from '../../lib/useGameRound';
-import { Button, Card, EmptyState, Input } from '../ui';
+import { Button, EmptyState, Input } from '../ui';
+import { FinishedCard, GameCard, GameProgress, GameStatusBar } from './GameShell';
 import type { Word } from '../../types';
 
-function normalize(value: string): string {
-  return value.trim().toLowerCase();
-}
-
-export function TypingGame({ words }: { words: Word[] }) {
+export function TypingGame({
+  words,
+  favoritesOnly = false,
+}: {
+  words: Word[];
+  favoritesOnly?: boolean;
+}) {
   const {
     pool,
     current,
     index,
     score,
-    streak,
     bestStreak,
     lives,
     answeredCount,
@@ -27,10 +29,18 @@ export function TypingGame({ words }: { words: Word[] }) {
   const [value, setValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Other words that mean the same thing (identical translation) are also
+  // accepted, so a genuine synonym isn't marked wrong just because a
+  // different word happened to be drawn for this round.
+  const acceptedTerms = useMemo(() => {
+    if (!current) return [];
+    return [current, ...findSynonyms(current, words)].map((w) => w.term);
+  }, [current, words]);
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
     if (feedback !== 'idle' || !current || !value.trim()) return;
-    const correct = normalize(value) === normalize(current.term);
+    const correct = acceptedTerms.some((term) => normalizeText(term) === normalizeText(value));
     submitAnswer(correct, () => {
       setValue('');
       inputRef.current?.focus();
@@ -46,62 +56,45 @@ export function TypingGame({ words }: { words: Word[] }) {
     return (
       <EmptyState
         title="Yazma modu için en az 1 kelime gerekiyor"
-        description="Kelimeler sayfasından birkaç kelime ekleyip tekrar dene."
+        description={emptyWordsHint(
+          favoritesOnly,
+          'Kelimeler sayfasından birkaç kelime ekleyip tekrar dene.',
+        )}
       />
     );
   }
 
   if (finished) {
     return (
-      <Card className="mx-auto max-w-md text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-          Oyun bitti
-        </p>
-        <p className="mt-2 text-4xl font-bold text-indigo-600 dark:text-indigo-400">
-          {score}
-        </p>
-        <p className="text-sm text-slate-500 dark:text-zinc-400">puan</p>
-        <p className="mt-3 text-sm text-slate-500 dark:text-zinc-400">
-          En uzun seri: {bestStreak} · {answeredCount} / {pool.length} soru
-        </p>
-        <Button className="mx-auto mt-5" onClick={handleRestart}>
-          <RotateCcw size={16} /> Tekrar Oyna
-        </Button>
-      </Card>
+      <FinishedCard
+        value={score}
+        valueLabel="puan"
+        detail={`En uzun seri: ${bestStreak} · ${answeredCount} / ${pool.length} soru`}
+        onRestart={handleRestart}
+      />
     );
   }
 
   if (!current) return null;
 
   return (
-    <div className="mx-auto max-w-lg">
-      <div className="mb-4 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-1">
-          {Array.from({ length: START_LIVES }).map((_, i) => (
-            <Heart
-              key={i}
-              size={16}
-              className={i < lives ? 'text-red-500' : 'text-slate-300 dark:text-zinc-700'}
-              fill={i < lives ? 'currentColor' : 'none'}
-            />
-          ))}
-        </div>
-        <span className="font-medium text-slate-600 dark:text-zinc-300">
-          Soru {index + 1} / {pool.length}
-        </span>
-        <span className="flex items-center gap-1 font-semibold text-amber-500">
-          <Zap size={15} fill="currentColor" /> {streak}
-        </span>
-      </div>
+    <GameCard>
+      <GameStatusBar
+        lives={lives}
+        maxLives={START_LIVES}
+        current={index + 1}
+        total={pool.length}
+        score={score}
+      />
 
-      <Card className="mb-4 flex min-h-[120px] flex-col items-center justify-center text-center">
-        <p className="text-xs text-slate-400">Bu anlamın İngilizcesini yaz</p>
-        <p className="mt-2 text-3xl font-semibold text-indigo-600 dark:text-indigo-400">
+      <div className="text-center">
+        <p className="text-xs font-medium text-muted">Bu anlamın İngilizcesini yaz</p>
+        <p className="mt-3 text-3xl font-bold text-foreground sm:text-4xl">
           {current.translation}
         </p>
-      </Card>
+      </div>
 
-      <form onSubmit={submit} className="space-y-2">
+      <form onSubmit={submit} className="mt-8 space-y-2.5">
         <Input
           ref={inputRef}
           autoFocus
@@ -119,7 +112,7 @@ export function TypingGame({ words }: { words: Word[] }) {
         />
         {feedback === 'wrong' && (
           <p className="text-sm text-red-500">
-            Doğrusu: <span className="font-semibold">{current.term}</span>
+            Doğrusu: <span className="font-semibold">{acceptedTerms.join(' / ')}</span>
           </p>
         )}
         <Button type="submit" className="w-full" disabled={feedback !== 'idle'}>
@@ -127,7 +120,7 @@ export function TypingGame({ words }: { words: Word[] }) {
         </Button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-slate-400">Skor: {score}</p>
-    </div>
+      <GameProgress current={index + 1} total={pool.length} />
+    </GameCard>
   );
 }

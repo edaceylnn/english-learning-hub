@@ -4,7 +4,6 @@ import { Route, Routes } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { DashboardPage } from './pages/DashboardPage';
 import { WordsPage } from './pages/WordsPage';
-import { ReviewPage } from './pages/ReviewPage';
 import { GamePage } from './pages/GamePage';
 import { NotesPage } from './pages/NotesPage';
 import { LessonNotesPage } from './pages/LessonNotesPage';
@@ -72,7 +71,6 @@ function AppShell() {
             <Routes>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/words" element={<WordsPage />} />
-              <Route path="/review" element={<ReviewPage />} />
               <Route path="/game" element={<GamePage />} />
               <Route path="/notes" element={<NotesPage />} />
               <Route path="/lessons" element={<LessonNotesPage />} />

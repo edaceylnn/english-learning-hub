@@ -1,19 +1,32 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Heart, RotateCcw, Zap } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { pickGamePool, shuffle } from '../../lib/gameWords';
-import { Button, Card, EmptyState, SpeakButton } from '../ui';
+import {
+  emptyWordsHint,
+  GAME_ROUND_SIZE,
+  pickGamePool,
+  shuffle,
+  translationsOverlap,
+} from '../../lib/gameWords';
+import { EmptyState, SpeakButton } from '../ui';
+import { FinishedCard, GameCard, GameProgress, GameStatusBar } from './GameShell';
 import type { Word } from '../../types';
 
 const OPTION_COUNT = 4;
 const START_LIVES = 3;
 
-export function QuizGame({ words }: { words: Word[] }) {
-  const { reviewWord } = useApp();
+export function QuizGame({
+  words,
+  favoritesOnly = false,
+}: {
+  words: Word[];
+  favoritesOnly?: boolean;
+}) {
+  const { logWordPractice, reviewLog } = useApp();
   const [seed, setSeed] = useState(0);
 
   const pool = useMemo(
-    () => pickGamePool(words),
+    () => pickGamePool(words, GAME_ROUND_SIZE, reviewLog),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [words.length, seed],
   );
@@ -32,9 +45,17 @@ export function QuizGame({ words }: { words: Word[] }) {
 
   const options = useMemo(() => {
     if (!current) return [];
-    const distractors = shuffle(
-      words.filter((w) => w.id !== current.id),
-    ).slice(0, OPTION_COUNT - 1);
+    const distractors: Word[] = [];
+    for (const w of shuffle(words.filter((w) => w.id !== current.id))) {
+      if (
+        translationsOverlap(w.translation, current.translation) ||
+        distractors.some((d) => translationsOverlap(w.translation, d.translation))
+      ) {
+        continue;
+      }
+      distractors.push(w);
+      if (distractors.length === OPTION_COUNT - 1) break;
+    }
     return shuffle([current, ...distractors]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current?.id, words.length]);
@@ -54,7 +75,9 @@ export function QuizGame({ words }: { words: Word[] }) {
 
   function choose(option: Word) {
     if (answeredId || !current) return;
-    const correct = option.id === current.id;
+    const correct =
+      option.id === current.id ||
+      translationsOverlap(option.translation, current.translation);
 
     setAnsweredId(option.id);
     setCorrectId(current.id);
@@ -62,7 +85,7 @@ export function QuizGame({ words }: { words: Word[] }) {
     const newStreak = correct ? streak + 1 : 0;
     const newLives = correct ? lives : lives - 1;
 
-    reviewWord(current.id, correct ? (streak >= 2 ? 'easy' : 'good') : 'again');
+    logWordPractice(current.id, correct ? (streak >= 2 ? 'easy' : 'good') : 'again');
     setStreak(newStreak);
     setBestStreak((b) => Math.max(b, newStreak));
     setLives(newLives);
@@ -99,91 +122,96 @@ export function QuizGame({ words }: { words: Word[] }) {
     return (
       <EmptyState
         title="Quiz için en az 2 kelime gerekiyor"
-        description="Kelimeler sayfasından birkaç kelime ekleyip tekrar dene."
+        description={emptyWordsHint(
+          favoritesOnly,
+          'Kelimeler sayfasından birkaç kelime ekleyip tekrar dene.',
+        )}
       />
     );
   }
 
   if (finished) {
     return (
-      <Card className="mx-auto max-w-md text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-          Oyun bitti
-        </p>
-        <p className="mt-2 text-4xl font-bold text-indigo-600 dark:text-indigo-400">
-          {score}
-        </p>
-        <p className="text-sm text-slate-500 dark:text-zinc-400">puan</p>
-        <p className="mt-3 text-sm text-slate-500 dark:text-zinc-400">
-          En uzun seri: {bestStreak} · {answeredCount} / {pool.length} soru
-        </p>
-        <Button className="mx-auto mt-5" onClick={restart}>
-          <RotateCcw size={16} /> Tekrar Oyna
-        </Button>
-      </Card>
+      <FinishedCard
+        value={score}
+        valueLabel="puan"
+        detail={`En uzun seri: ${bestStreak} · ${answeredCount} / ${pool.length} soru`}
+        onRestart={restart}
+      />
     );
   }
 
   if (!current) return null;
 
   return (
-    <div className="mx-auto max-w-xl">
-      <div className="mb-4 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-1 text-slate-500 dark:text-zinc-400">
-          {Array.from({ length: START_LIVES }).map((_, i) => (
-            <Heart
-              key={i}
-              size={16}
-              className={i < lives ? 'text-red-500' : 'text-slate-300 dark:text-zinc-700'}
-              fill={i < lives ? 'currentColor' : 'none'}
-            />
-          ))}
-        </div>
-        <span className="font-medium text-slate-600 dark:text-zinc-300">
-          Soru {index + 1} / {pool.length}
-        </span>
-        <span className="flex items-center gap-1 font-semibold text-amber-500">
-          <Zap size={15} fill="currentColor" /> {streak}
-        </span>
-      </div>
+    <GameCard>
+      <GameStatusBar
+        lives={lives}
+        maxLives={START_LIVES}
+        current={index + 1}
+        total={pool.length}
+        score={score}
+      />
 
-      <Card className="mb-4 flex min-h-[120px] flex-col items-center justify-center text-center">
-        <p className="text-xs text-slate-400">Bu kelimenin anlamı nedir?</p>
-        <div className="mt-2 flex items-center gap-2">
-          <p className="text-3xl font-semibold text-slate-900 dark:text-zinc-50">
+      <div className="text-center">
+        <p className="text-xs font-medium text-muted">Bu kelimenin anlamı nedir?</p>
+        <div className="mt-3 flex items-center justify-center gap-2.5">
+          <p className="text-3xl font-bold text-foreground sm:text-4xl">
             {current.term}
           </p>
           <SpeakButton text={current.term} size={20} />
         </div>
-      </Card>
+      </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {options.map((opt, i) => {
           const isAnswered = !!answeredId;
           const isCorrectOption = opt.id === correctId;
           const isChosenWrong = isAnswered && opt.id === answeredId && !isCorrectOption;
+          const isDimmed = isAnswered && !isCorrectOption && !isChosenWrong;
           return (
             <button
               key={opt.id}
               onClick={() => choose(opt)}
               disabled={isAnswered}
-              className={`rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 rounded-xl border px-4 py-4 text-left transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-default ${
                 isAnswered && isCorrectOption
-                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
+                  ? 'border-emerald-500/60 bg-emerald-500/10'
                   : isChosenWrong
-                    ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
+                    ? 'border-red-500/60 bg-red-500/10'
+                    : `border-border bg-surface hover:-translate-y-px hover:border-primary/40 hover:bg-primary/5 ${
+                        isDimmed ? 'opacity-50' : ''
+                      }`
               }`}
             >
-              <span className="mr-1.5 text-slate-400">{i + 1}.</span>
-              {opt.translation}
+              <span className="text-sm font-medium text-muted">{i + 1}.</span>
+              <span
+                className={`flex-1 text-sm font-medium ${
+                  isAnswered && isCorrectOption
+                    ? 'text-emerald-700 dark:text-emerald-300'
+                    : isChosenWrong
+                      ? 'text-red-700 dark:text-red-300'
+                      : 'text-foreground'
+                }`}
+              >
+                {opt.translation}
+              </span>
+              {isAnswered && isCorrectOption && (
+                <Check size={16} className="animate-pop-in shrink-0 text-emerald-500" />
+              )}
+              {isChosenWrong && (
+                <X size={16} className="animate-pop-in shrink-0 text-red-500" />
+              )}
             </button>
           );
         })}
       </div>
 
-      <p className="mt-4 text-center text-sm text-slate-400">Skor: {score}</p>
-      <p className="mt-1 text-center text-xs text-slate-400">1-4: cevapla</p>
-    </div>
+      <p className="mt-5 text-center text-[11px] text-muted/60">
+        Klavyeden 1-4 tuşlarıyla da cevaplayabilirsin
+      </p>
+
+      <GameProgress current={index + 1} total={pool.length} />
+    </GameCard>
   );
 }

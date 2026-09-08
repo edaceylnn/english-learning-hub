@@ -5,8 +5,7 @@ Kişisel İngilizce çalışma alanı — kelime kartları, aralıklı tekrar (s
 ## Özellikler
 
 - **Kelimeler** — kelime/anlam/örnek cümle ekleme, etiketleme, toplu ekleme
-- **Kelime Tekrarı** — aralıklı tekrar algoritmasıyla günlük tekrar akışı
-- **Oyun** — Quiz, Typing, Cloze ve Matching modlarıyla pratik
+- **Oyun** — Quiz, Typing, Cloze ve Matching modlarıyla kelime pratiği
 - **Notlar & Ders Notları** — serbest notlar ve ders bazlı kayıtlar
 - **Yapılacaklar & Takvim** — görev ve ders takibi
 - **İstatistikler** — ilerleme grafikleri

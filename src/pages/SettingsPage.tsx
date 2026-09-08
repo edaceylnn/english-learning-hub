@@ -86,7 +86,7 @@ export function SettingsPage() {
                 placeholder="Adın"
               />
             </Field>
-            <Field label="Günlük tekrar hedefi">
+            <Field label="Günlük çalışma hedefi">
               <Input
                 type="number"
                 min={1}

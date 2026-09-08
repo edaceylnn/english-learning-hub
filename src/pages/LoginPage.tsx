@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { BrandLogo } from '../components/BrandLogo';
 import { PrimaryButton } from '../components/dashboard';
 import { Field, Input } from '../components/ui';
 
@@ -44,9 +45,7 @@ export function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 sm:p-8">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-sm font-bold text-white">
-            E
-          </div>
+          <BrandLogo className="mb-3 h-12 w-12 drop-shadow-sm" />
           <h1 className="text-lg font-semibold text-foreground">English Study</h1>
           <p className="mt-1 text-sm text-muted">Devam etmek için giriş yap</p>
         </div>

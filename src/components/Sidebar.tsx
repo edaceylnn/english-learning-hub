@@ -9,7 +9,6 @@ import {
   LogOut,
   Moon,
   NotebookPen,
-  Repeat,
   Settings as SettingsIcon,
   Sparkles,
   StickyNote,
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import { BrandLogo } from './BrandLogo';
 
 type NavItem = {
   to: string;
@@ -32,7 +32,6 @@ const navGroups: { label: string; items: NavItem[] }[] = [
     items: [
       { to: '/', label: 'Panel', icon: LayoutDashboard, end: true },
       { to: '/words', label: 'Kelimeler', icon: BookOpen },
-      { to: '/review', label: 'Kelime Tekrarı', icon: Repeat },
       { to: '/game', label: 'Oyun', icon: Gamepad2 },
     ],
   },
@@ -61,11 +60,8 @@ export function Sidebar({
   open: boolean;
   onNavigate: () => void;
 }) {
-  const { settings, updateSettings, words } = useApp();
+  const { settings, updateSettings } = useApp();
   const { scope, logout } = useAuth();
-  const dueCount = words.filter(
-    (w) => new Date(w.nextReviewAt).getTime() <= Date.now(),
-  ).length;
 
   return (
     <aside
@@ -74,9 +70,7 @@ export function Sidebar({
       }`}
     >
       <div className="flex items-center gap-3 border-b border-border px-5 py-5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-white">
-          E
-        </div>
+        <BrandLogo className="h-9 w-9 shrink-0 drop-shadow-sm" />
         <div className="min-w-0">
           <p className="truncate text-[15px] font-semibold leading-tight text-foreground">
             English Study
@@ -88,8 +82,8 @@ export function Sidebar({
       </div>
 
       {scope === 'demo' && (
-        <div className="mx-3 mt-3 flex items-center gap-1.5 rounded-[10px] border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
-          <Sparkles size={13} className="shrink-0" />
+        <div className="mx-3 mt-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface-hover/60 px-2.5 py-1.5 text-[11px] font-medium text-muted">
+          <Sparkles size={11} className="shrink-0 text-primary/70" />
           Demo modu — veriler periyodik sıfırlanır
         </div>
       )}
@@ -97,7 +91,7 @@ export function Sidebar({
       <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted/70">
+            <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted/50">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -110,7 +104,7 @@ export function Sidebar({
                   className={({ isActive }) =>
                     `${navLinkClasses} ${
                       isActive
-                        ? 'bg-primary/10 text-primary'
+                        ? 'bg-primary/8 text-primary'
                         : 'text-muted hover:bg-surface-hover hover:text-foreground'
                     }`
                   }
@@ -119,11 +113,6 @@ export function Sidebar({
                     <Icon size={18} className="shrink-0" />
                     <span className="truncate">{label}</span>
                   </span>
-                  {to === '/review' && dueCount > 0 && (
-                    <span className="flex h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-white">
-                      {dueCount}
-                    </span>
-                  )}
                 </NavLink>
               ))}
             </div>
@@ -138,7 +127,7 @@ export function Sidebar({
           className={({ isActive }) =>
             `${navLinkClasses} ${
               isActive
-                ? 'bg-primary/10 text-primary'
+                ? 'bg-primary/8 text-primary'
                 : 'text-muted hover:bg-surface-hover hover:text-foreground'
             }`
           }

@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState } from 'react';
-import { Heart, RotateCcw, Zap } from 'lucide-react';
+import { emptyWordsHint } from '../../lib/gameWords';
 import { START_LIVES, useGameRound } from '../../lib/useGameRound';
-import { Button, Card, EmptyState, Input } from '../ui';
+import { Button, EmptyState, Input } from '../ui';
+import { FinishedCard, GameCard, GameProgress, GameStatusBar } from './GameShell';
 import type { Word } from '../../types';
 
 function normalize(value: string): string {
@@ -24,7 +25,13 @@ function buildCloze(word: Word): string {
   );
 }
 
-export function ClozeGame({ words }: { words: Word[] }) {
+export function ClozeGame({
+  words,
+  favoritesOnly = false,
+}: {
+  words: Word[];
+  favoritesOnly?: boolean;
+}) {
   const clozeWords = useMemo(() => words.filter(containsTerm), [words]);
 
   const {
@@ -32,7 +39,6 @@ export function ClozeGame({ words }: { words: Word[] }) {
     current,
     index,
     score,
-    streak,
     bestStreak,
     lives,
     answeredCount,
@@ -64,63 +70,46 @@ export function ClozeGame({ words }: { words: Word[] }) {
     return (
       <EmptyState
         title="Boşluk doldurma için en az 3 örnek cümleli kelime gerekiyor"
-        description='Kelimeler sayfasında kelimenin örnek cümlesine kelimeyi geçirerek ekle (ör. "Smartphones have become ubiquitous").'
+        description={emptyWordsHint(
+          favoritesOnly,
+          'Kelimeler sayfasında kelimenin örnek cümlesine kelimeyi geçirerek ekle (ör. "Smartphones have become ubiquitous").',
+        )}
       />
     );
   }
 
   if (finished) {
     return (
-      <Card className="mx-auto max-w-md text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-          Oyun bitti
-        </p>
-        <p className="mt-2 text-4xl font-bold text-indigo-600 dark:text-indigo-400">
-          {score}
-        </p>
-        <p className="text-sm text-slate-500 dark:text-zinc-400">puan</p>
-        <p className="mt-3 text-sm text-slate-500 dark:text-zinc-400">
-          En uzun seri: {bestStreak} · {answeredCount} / {pool.length} soru
-        </p>
-        <Button className="mx-auto mt-5" onClick={handleRestart}>
-          <RotateCcw size={16} /> Tekrar Oyna
-        </Button>
-      </Card>
+      <FinishedCard
+        value={score}
+        valueLabel="puan"
+        detail={`En uzun seri: ${bestStreak} · ${answeredCount} / ${pool.length} soru`}
+        onRestart={handleRestart}
+      />
     );
   }
 
   if (!current) return null;
 
   return (
-    <div className="mx-auto max-w-lg">
-      <div className="mb-4 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-1">
-          {Array.from({ length: START_LIVES }).map((_, i) => (
-            <Heart
-              key={i}
-              size={16}
-              className={i < lives ? 'text-red-500' : 'text-slate-300 dark:text-zinc-700'}
-              fill={i < lives ? 'currentColor' : 'none'}
-            />
-          ))}
-        </div>
-        <span className="font-medium text-slate-600 dark:text-zinc-300">
-          Soru {index + 1} / {pool.length}
-        </span>
-        <span className="flex items-center gap-1 font-semibold text-amber-500">
-          <Zap size={15} fill="currentColor" /> {streak}
-        </span>
-      </div>
+    <GameCard>
+      <GameStatusBar
+        lives={lives}
+        maxLives={START_LIVES}
+        current={index + 1}
+        total={pool.length}
+        score={score}
+      />
 
-      <Card className="mb-4 flex min-h-[120px] flex-col items-center justify-center gap-2 text-center">
-        <p className="text-xs text-slate-400">Cümledeki boşluğu doldur</p>
-        <p className="text-xl font-medium text-slate-800 dark:text-zinc-100">
+      <div className="text-center">
+        <p className="text-xs font-medium text-muted">Cümledeki boşluğu doldur</p>
+        <p className="mt-3 text-xl font-semibold text-foreground sm:text-2xl">
           "{buildCloze(current)}"
         </p>
-        <p className="text-sm text-slate-400">{current.translation}</p>
-      </Card>
+        <p className="mt-2 text-sm text-muted">{current.translation}</p>
+      </div>
 
-      <form onSubmit={submit} className="space-y-2">
+      <form onSubmit={submit} className="mt-8 space-y-2.5">
         <Input
           ref={inputRef}
           autoFocus
@@ -146,7 +135,7 @@ export function ClozeGame({ words }: { words: Word[] }) {
         </Button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-slate-400">Skor: {score}</p>
-    </div>
+      <GameProgress current={index + 1} total={pool.length} />
+    </GameCard>
   );
 }

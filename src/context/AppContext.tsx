@@ -41,6 +41,7 @@ interface AppContextValue {
   updateWord: (id: string, patch: Partial<Word>) => void;
   deleteWord: (id: string) => void;
   reviewWord: (id: string, answer: ReviewAnswer) => void;
+  logWordPractice: (id: string, answer: ReviewAnswer) => void;
   toggleFavoriteWord: (id: string) => void;
 
   addNote: (data: Pick<Note, 'title' | 'content' | 'category' | 'tags'>) => Note;
@@ -176,6 +177,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setWords((prev) => prev.filter((w) => w.id !== id));
       },
       reviewWord: (id, answer) => {
+        const reviewedAt = new Date().toISOString();
         setWords((prev) =>
           prev.map((w) => {
             if (w.id !== id) return w;
@@ -183,10 +185,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
             return {
               ...w,
               ...result,
-              lastReviewedAt: new Date().toISOString(),
+              lastReviewedAt: reviewedAt,
             };
           }),
         );
+        setReviewLog((prev) => [
+          {
+            id: generateId(),
+            wordId: id,
+            answer,
+            reviewedAt,
+          },
+          ...prev,
+        ]);
+      },
+      logWordPractice: (id, answer) => {
         setReviewLog((prev) => [
           {
             id: generateId(),

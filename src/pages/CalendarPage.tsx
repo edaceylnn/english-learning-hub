@@ -21,7 +21,7 @@ import { todoPriorityTone } from '../lib/labels';
 const weekDays = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'];
 
 export function CalendarPage() {
-  const { lessonNotes, todos, words, notes } = useApp();
+  const { lessonNotes, todos, notes } = useApp();
   const [month, setMonth] = useState(() => new Date());
   const [selected, setSelected] = useState(() => new Date());
 
@@ -36,16 +36,15 @@ export function CalendarPage() {
     const dueTodos = todos.filter(
       (t) => t.dueDate && isSameDay(new Date(t.dueDate), day),
     );
-    const reviews = words.filter((w) => isSameDay(new Date(w.nextReviewAt), day));
     const dayNotes = notes.filter((n) => isSameDay(new Date(n.createdAt), day));
-    return { lessons, dueTodos, reviews, dayNotes };
+    return { lessons, dueTodos, dayNotes };
   }
 
   const selectedEvents = eventsForDay(selected);
 
   return (
     <div>
-      <PageHeader title="Takvim" subtitle="Ders, not, görev ve tekrarlarını gör" />
+      <PageHeader title="Takvim" subtitle="Ders, not ve görevlerini gör" />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
@@ -79,7 +78,7 @@ export function CalendarPage() {
 
           <div className="grid grid-cols-7 gap-1">
             {days.map((day) => {
-              const { lessons, dueTodos, reviews, dayNotes } = eventsForDay(day);
+              const { lessons, dueTodos, dayNotes } = eventsForDay(day);
               const total = lessons.length + dueTodos.length + dayNotes.length;
               return (
                 <button
@@ -104,9 +103,6 @@ export function CalendarPage() {
                     {total > 0 && (
                       <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
                     )}
-                    {reviews.length > 0 && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                    )}
                   </div>
                   {total > 0 && (
                     <span className="mt-auto text-[10px] text-slate-400">
@@ -124,27 +120,12 @@ export function CalendarPage() {
             {format(selected, 'd MMMM yyyy, EEEE', { locale: tr })}
           </p>
 
-          {selectedEvents.reviews.length === 0 &&
-          selectedEvents.lessons.length === 0 &&
+          {selectedEvents.lessons.length === 0 &&
           selectedEvents.dueTodos.length === 0 &&
           selectedEvents.dayNotes.length === 0 ? (
             <p className="text-sm text-slate-400">Bu gün için kayıt yok.</p>
           ) : (
             <div className="space-y-4">
-              {selectedEvents.reviews.length > 0 && (
-                <div>
-                  <p className="mb-1 text-xs font-semibold uppercase text-slate-400">
-                    Tekrar ({selectedEvents.reviews.length})
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selectedEvents.reviews.map((w) => (
-                      <Badge key={w.id} tone="amber">
-                        {w.term}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
               {selectedEvents.lessons.length > 0 && (
                 <div>
                   <p className="mb-1 text-xs font-semibold uppercase text-slate-400">

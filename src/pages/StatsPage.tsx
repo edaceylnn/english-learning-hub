@@ -94,7 +94,7 @@ export function StatsPage() {
 
         <Card>
           <p className="mb-4 font-semibold text-slate-900 dark:text-zinc-50">
-            Haftalık Tekrar Sayısı
+            Haftalık Oyun Pratiği
           </p>
           <div className="flex h-32 items-end justify-between gap-2">
             {weeklyReviews.map(({ day, count }) => (

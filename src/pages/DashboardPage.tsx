@@ -5,6 +5,7 @@ import {
   BookOpen,
   Check,
   Flame,
+  Gamepad2,
   ListChecks,
   Plus,
   Repeat,
@@ -30,9 +31,6 @@ export function DashboardPage() {
     useApp();
   const navigate = useNavigate();
 
-  const dueWords = words.filter(
-    (w) => new Date(w.nextReviewAt).getTime() <= Date.now(),
-  );
   const openTodos = todos.filter((t) => t.status !== 'done');
   const todayTodos = todos.filter(
     (t) => t.dueDate && isSameDay(new Date(t.dueDate), new Date()),
@@ -84,27 +82,27 @@ export function DashboardPage() {
         </div>
       </div>
 
-      {dueWords.length > 0 ? (
+      {words.length > 0 ? (
         <div className="relative mb-6 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-surface to-surface p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <Repeat size={20} />
+                <Gamepad2 size={20} />
               </div>
               <div>
                 <p className="text-[15px] font-semibold text-foreground">
-                  Günlük tekrar
+                  Oyun pratiği
                 </p>
                 <p className="mt-0.5 text-sm text-foreground/90">
-                  Bugün tekrar etmen gereken {dueWords.length} kelime var
+                  {words.length} kelimeni oyunlarla tekrar edebilirsin
                 </p>
                 <p className="mt-0.5 text-sm text-muted">
-                  Hafızanı tazelemek için birkaç dakika ayır.
+                  Quiz, yazma, boşluk doldurma ve eşleştirme modları hazır.
                 </p>
               </div>
             </div>
-            <PrimaryButton to="/review">
-              Tekrara Başla <ArrowRight size={16} />
+            <PrimaryButton to="/game">
+              Oyuna Başla <ArrowRight size={16} />
             </PrimaryButton>
           </div>
         </div>
@@ -116,10 +114,10 @@ export function DashboardPage() {
             </div>
             <div>
               <p className="text-[15px] font-semibold text-foreground">
-                Bugün için tekrar yok
+                Henüz kelime yok
               </p>
               <p className="mt-0.5 text-sm text-muted">
-                Harika gidiyorsun — yarın tekrar kontrol et.
+                Oyunlara başlamak için birkaç kelime ekle.
               </p>
             </div>
           </div>
@@ -265,13 +263,12 @@ export function DashboardPage() {
           <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-muted/70">
             Bugün
           </p>
-          {dueWords.length === 0 && todayTodos.length === 0 ? (
+          {todayTodos.length === 0 ? (
             <p className="mt-1.5 text-sm text-muted">
               Bugün için planlanan bir şey yok.
             </p>
           ) : (
             <ul className="mt-1.5 space-y-1 text-sm text-foreground/90">
-              {dueWords.length > 0 && <li>• {dueWords.length} kelime tekrarı</li>}
               {todayTodos.slice(0, 2).map((t) => (
                 <li key={t.id}>• {t.title}</li>
               ))}

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { pickGamePool } from './gameWords';
+import { GAME_ROUND_SIZE, pickGamePool } from './gameWords';
 import type { Word } from '../types';
 
 export const START_LIVES = 3;
@@ -10,15 +10,15 @@ export type Feedback = 'idle' | 'correct' | 'wrong';
 
 /**
  * Shared scoring/lives/streak state machine for single-answer game modes
- * (Yazma, Boşluk Doldurma). Each correct/wrong answer also feeds the word's
- * spaced-repetition schedule via reviewWord.
+ * (Yazma, Boşluk Doldurma). Each answer is logged for stats and fair future
+ * rotation, without changing the word's spaced-repetition schedule.
  */
 export function useGameRound(words: Word[]) {
-  const { reviewWord } = useApp();
+  const { logWordPractice, reviewLog } = useApp();
   const [seed, setSeed] = useState(0);
 
   const pool = useMemo(
-    () => pickGamePool(words),
+    () => pickGamePool(words, GAME_ROUND_SIZE, reviewLog),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [words.length, seed],
   );
@@ -53,7 +53,7 @@ export function useGameRound(words: Word[]) {
     const newStreak = correct ? streak + 1 : 0;
     const newLives = correct ? lives : lives - 1;
 
-    reviewWord(current.id, correct ? (streak >= 2 ? 'easy' : 'good') : 'again');
+    logWordPractice(current.id, correct ? (streak >= 2 ? 'easy' : 'good') : 'again');
     setStreak(newStreak);
     setBestStreak((b) => Math.max(b, newStreak));
     setLives(newLives);

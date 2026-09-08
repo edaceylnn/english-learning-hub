@@ -1,19 +1,43 @@
 import { useEffect, useMemo, useState } from 'react';
-import { RotateCcw, Timer as TimerIcon } from 'lucide-react';
+import { Timer as TimerIcon } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { formatSeconds, shuffle } from '../../lib/gameWords';
-import { Button, Card, EmptyState } from '../ui';
+import {
+  emptyWordsHint,
+  formatSeconds,
+  shuffle,
+  translationsOverlap,
+  pickGamePool,
+} from '../../lib/gameWords';
+import { EmptyState } from '../ui';
+import { FinishedCard, GameCard } from './GameShell';
 import type { Word } from '../../types';
 
 const PAIR_COUNT = 6;
 
-export function MatchingGame({ words }: { words: Word[] }) {
-  const { reviewWord } = useApp();
+export function MatchingGame({
+  words,
+  favoritesOnly = false,
+}: {
+  words: Word[];
+  favoritesOnly?: boolean;
+}) {
+  const { logWordPractice, reviewLog } = useApp();
   const [seed, setSeed] = useState(0);
 
   const pairs = useMemo(() => {
-    const count = Math.min(PAIR_COUNT, words.length);
-    return shuffle(words).slice(0, count);
+    const selected: Word[] = [];
+    for (const word of pickGamePool(words, undefined, reviewLog)) {
+      if (
+        selected.some((item) =>
+          translationsOverlap(item.translation, word.translation),
+        )
+      ) {
+        continue;
+      }
+      selected.push(word);
+      if (selected.length === PAIR_COUNT) break;
+    }
+    return selected;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [words.length, seed]);
 
@@ -46,14 +70,22 @@ export function MatchingGame({ words }: { words: Word[] }) {
 
   useEffect(() => {
     if (!selectedLeft || !selectedRight) return;
-    if (selectedLeft === selectedRight) {
-      reviewWord(selectedLeft, 'good');
+    const leftWord = pairs.find((word) => word.id === selectedLeft);
+    const rightWord = pairs.find((word) => word.id === selectedRight);
+    const correct =
+      selectedLeft === selectedRight ||
+      (!!leftWord &&
+        !!rightWord &&
+        translationsOverlap(leftWord.translation, rightWord.translation));
+
+    if (correct) {
+      logWordPractice(selectedLeft, 'good');
       setMatchedIds((prev) => new Set(prev).add(selectedLeft));
       setSelectedLeft(null);
       setSelectedRight(null);
     } else {
-      reviewWord(selectedLeft, 'again');
-      reviewWord(selectedRight, 'again');
+      logWordPractice(selectedLeft, 'again');
+      logWordPractice(selectedRight, 'again');
       setMistakes((m) => m + 1);
       setWrongPair([selectedLeft, selectedRight]);
       const t = setTimeout(() => {
@@ -89,39 +121,34 @@ export function MatchingGame({ words }: { words: Word[] }) {
     setSelectedRight(id);
   }
 
-  if (words.length < 3) {
+  if (pairs.length < 3) {
     return (
       <EmptyState
-        title="Eşleştirme için en az 3 kelime gerekiyor"
-        description="Kelimeler sayfasından birkaç kelime ekleyip tekrar dene."
+        title="Eşleştirme için en az 3 farklı anlam gerekiyor"
+        description={emptyWordsHint(
+          favoritesOnly,
+          'Aynı Türkçe anlama sahip kelimeler aynı turda ayrıştırılmadığı için birkaç farklı anlamlı kelime ekleyip tekrar dene.',
+        )}
       />
     );
   }
 
   if (finished) {
     return (
-      <Card className="mx-auto max-w-md text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
-          Tamamlandı!
-        </p>
-        <p className="mt-2 text-4xl font-bold text-indigo-600 dark:text-indigo-400">
-          {formatSeconds(elapsed)}
-        </p>
-        <p className="text-sm text-slate-500 dark:text-zinc-400">
-          {mistakes} hata ile {pairs.length} çift eşleştirildi
-        </p>
-        <Button className="mx-auto mt-5" onClick={restart}>
-          <RotateCcw size={16} /> Tekrar Oyna
-        </Button>
-      </Card>
+      <FinishedCard
+        title="Tamamlandı!"
+        value={formatSeconds(elapsed)}
+        valueLabel={`${mistakes} hata ile ${pairs.length} çift eşleştirildi`}
+        onRestart={restart}
+      />
     );
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <div className="mb-4 flex items-center justify-between text-sm text-slate-500 dark:text-zinc-400">
-        <span className="flex items-center gap-1">
-          <TimerIcon size={15} /> {formatSeconds(elapsed)}
+    <GameCard>
+      <div className="mb-6 flex items-center justify-between gap-3 text-xs font-medium text-muted">
+        <span className="flex items-center gap-1.5">
+          <TimerIcon size={14} /> {formatSeconds(elapsed)}
         </span>
         <span>
           {matchedIds.size} / {pairs.length} eşleşti
@@ -140,14 +167,14 @@ export function MatchingGame({ words }: { words: Word[] }) {
                 key={item.id}
                 onClick={() => selectLeft(item.id)}
                 disabled={isMatched}
-                className={`w-full rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+                className={`w-full rounded-xl border px-3.5 py-3 text-left text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
                   isMatched
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-400 opacity-60 dark:border-emerald-500/20 dark:bg-emerald-500/5'
+                    ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600/60 dark:text-emerald-300/50'
                     : isWrong
-                      ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
+                      ? 'border-red-500/60 bg-red-500/10 text-red-700 dark:text-red-300'
                       : isSelected
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border bg-surface text-foreground hover:-translate-y-px hover:border-primary/40 hover:bg-primary/5'
                 }`}
               >
                 {item.label}
@@ -165,14 +192,14 @@ export function MatchingGame({ words }: { words: Word[] }) {
                 key={item.id}
                 onClick={() => selectRight(item.id)}
                 disabled={isMatched}
-                className={`w-full rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition-colors ${
+                className={`w-full rounded-xl border px-3.5 py-3 text-left text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
                   isMatched
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-400 opacity-60 dark:border-emerald-500/20 dark:bg-emerald-500/5'
+                    ? 'border-emerald-500/20 bg-emerald-500/5 text-emerald-600/60 dark:text-emerald-300/50'
                     : isWrong
-                      ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
+                      ? 'border-red-500/60 bg-red-500/10 text-red-700 dark:text-red-300'
                       : isSelected
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-border bg-surface text-foreground hover:-translate-y-px hover:border-primary/40 hover:bg-primary/5'
                 }`}
               >
                 {item.label}
@@ -181,6 +208,6 @@ export function MatchingGame({ words }: { words: Word[] }) {
           })}
         </div>
       </div>
-    </div>
+    </GameCard>
   );
 }
