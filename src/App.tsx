@@ -17,44 +17,46 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-zinc-950">
+    <div className="flex h-screen w-screen overflow-hidden bg-background">
       <Sidebar open={sidebarOpen} onNavigate={() => setSidebarOpen(false)} />
 
       {sidebarOpen && (
         <button
           aria-label="Menüyü kapat"
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+          className="fixed inset-0 z-30 bg-black/50 lg:hidden"
         />
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900 lg:hidden">
+        <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="rounded-lg p-1.5 text-slate-600 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-slate-800"
+            className="rounded-lg p-1.5 text-muted hover:bg-surface-hover hover:text-foreground"
             aria-label="Menüyü aç"
           >
             <Menu size={20} />
           </button>
-          <span className="text-sm font-semibold text-slate-900 dark:text-zinc-50">
+          <span className="text-sm font-semibold text-foreground">
             English Study Workspace
           </span>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/words" element={<WordsPage />} />
-            <Route path="/review" element={<ReviewPage />} />
-            <Route path="/game" element={<GamePage />} />
-            <Route path="/notes" element={<NotesPage />} />
-            <Route path="/lessons" element={<LessonNotesPage />} />
-            <Route path="/todos" element={<TodosPage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
-            <Route path="/stats" element={<StatsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-          </Routes>
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-[1360px] p-4 sm:p-6 lg:p-8">
+            <Routes>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/words" element={<WordsPage />} />
+              <Route path="/review" element={<ReviewPage />} />
+              <Route path="/game" element={<GamePage />} />
+              <Route path="/notes" element={<NotesPage />} />
+              <Route path="/lessons" element={<LessonNotesPage />} />
+              <Route path="/todos" element={<TodosPage />} />
+              <Route path="/calendar" element={<CalendarPage />} />
+              <Route path="/stats" element={<StatsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
+          </div>
         </main>
       </div>
     </div>
