@@ -101,13 +101,13 @@ export function MatchingGame({ words }: { words: Word[] }) {
   if (finished) {
     return (
       <Card className="mx-auto max-w-md text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+        <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
           Tamamlandı!
         </p>
         <p className="mt-2 text-4xl font-bold text-indigo-600 dark:text-indigo-400">
           {formatSeconds(elapsed)}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-slate-500 dark:text-zinc-400">
           {mistakes} hata ile {pairs.length} çift eşleştirildi
         </p>
         <Button className="mx-auto mt-5" onClick={restart}>
@@ -119,7 +119,7 @@ export function MatchingGame({ words }: { words: Word[] }) {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="mb-4 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+      <div className="mb-4 flex items-center justify-between text-sm text-slate-500 dark:text-zinc-400">
         <span className="flex items-center gap-1">
           <TimerIcon size={15} /> {formatSeconds(elapsed)}
         </span>
@@ -147,7 +147,7 @@ export function MatchingGame({ words }: { words: Word[] }) {
                       ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
                       : isSelected
                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
                 }`}
               >
                 {item.label}
@@ -172,7 +172,7 @@ export function MatchingGame({ words }: { words: Word[] }) {
                       ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
                       : isSelected
                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
                 }`}
               >
                 {item.label}

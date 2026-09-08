@@ -15,11 +15,11 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-zinc-50">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
             {subtitle}
           </p>
         )}
@@ -38,7 +38,7 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 ${className}`}
+      className={`rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 ${className}`}
     >
       {children}
     </div>
@@ -79,7 +79,7 @@ export function Badge({
 }) {
   const tones: Record<string, string> = {
     slate:
-      'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+      'bg-slate-100 text-slate-700 dark:bg-zinc-800 dark:text-zinc-300',
     indigo:
       'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300',
     green:
@@ -118,9 +118,9 @@ export function Button({
     primary:
       'bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50',
     secondary:
-      'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700',
+      'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-slate-700',
     ghost:
-      'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
+      'text-slate-600 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-slate-800',
     danger: 'bg-red-600 text-white hover:bg-red-500',
   };
   return (
@@ -144,7 +144,7 @@ export const Input = forwardRef<
     <input
       ref={ref}
       {...rest}
-      className={`w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 ${className}`}
+      className={`w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 ${className}`}
     />
   );
 });
@@ -157,7 +157,7 @@ export const Textarea = forwardRef<
     <textarea
       ref={ref}
       {...rest}
-      className={`w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 ${className}`}
+      className={`w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 ${className}`}
     />
   );
 });
@@ -169,7 +169,7 @@ export function Select(
   return (
     <select
       {...rest}
-      className={`w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 ${className}`}
+      className={`w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 ${className}`}
     >
       {children}
     </select>
@@ -185,7 +185,7 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+      <span className="mb-1 block text-xs font-medium text-slate-500 dark:text-zinc-400">
         {label}
       </span>
       {children}
@@ -220,10 +220,10 @@ export function Modal({
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
       <div
-        className={`max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-md'} overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900`}
+        className={`max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-md'} overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900`}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-zinc-50">
             {title}
           </h2>
           <button
@@ -250,8 +250,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 py-16 text-center dark:border-slate-700">
-      <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 py-16 text-center dark:border-zinc-700">
+      <p className="text-sm font-medium text-slate-700 dark:text-zinc-300">
         {title}
       </p>
       {description && (
@@ -278,7 +278,7 @@ export function ConfirmDialog({
   return (
     <Modal open={open} onClose={onCancel} title={title}>
       {description && (
-        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mb-4 text-sm text-slate-500 dark:text-zinc-400">
           {description}
         </p>
       )}

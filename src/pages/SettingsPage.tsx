@@ -1,8 +1,15 @@
-import { useRef, useState } from 'react';
-import { Download, Moon, Sun, Trash2, Upload } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Download, Moon, Sun, Trash2, Upload, Volume2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Button, Card, ConfirmDialog, Field, Input, PageHeader } from '../components/ui';
+import { Button, Card, ConfirmDialog, Field, Input, PageHeader, Select } from '../components/ui';
 import { saveKey, type StoreKey } from '../lib/api';
+import {
+  getStoredVoiceURI,
+  isSpeechSupported,
+  loadVoices,
+  setPreferredVoiceURI,
+  speak,
+} from '../lib/speech';
 
 const DATA_KEYS: StoreKey[] = ['words', 'notes', 'lessonNotes', 'todos', 'reviewLog', 'settings'];
 
@@ -10,6 +17,20 @@ export function SettingsPage() {
   const { words, notes, lessonNotes, todos, reviewLog, settings, updateSettings } = useApp();
   const [resetOpen, setResetOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceURI, setVoiceURI] = useState(() => getStoredVoiceURI() ?? '');
+
+  useEffect(() => {
+    if (!isSpeechSupported()) return;
+    loadVoices().then((all) =>
+      setVoices(all.filter((v) => v.lang.toLowerCase().startsWith('en'))),
+    );
+  }, []);
+
+  function handleVoiceChange(uri: string) {
+    setVoiceURI(uri);
+    setPreferredVoiceURI(uri || null);
+  }
 
   function exportData() {
     const dump = { words, notes, lessonNotes, todos, reviewLog, settings };
@@ -54,7 +75,7 @@ export function SettingsPage() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card>
-          <p className="mb-4 font-semibold text-slate-900 dark:text-slate-50">
+          <p className="mb-4 font-semibold text-slate-900 dark:text-zinc-50">
             Genel
           </p>
           <div className="space-y-3">
@@ -76,7 +97,7 @@ export function SettingsPage() {
               />
             </Field>
             <div>
-              <span className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+              <span className="mb-1 block text-xs font-medium text-slate-500 dark:text-zinc-400">
                 Tema
               </span>
               <div className="flex gap-2">
@@ -97,11 +118,47 @@ export function SettingsPage() {
           </div>
         </Card>
 
+        {isSpeechSupported() && (
+          <Card>
+            <p className="mb-4 font-semibold text-slate-900 dark:text-zinc-50">
+              Telaffuz Sesi
+            </p>
+            <p className="mb-4 text-sm text-slate-500 dark:text-zinc-400">
+              Kelime kartlarındaki hoparlör ikonu bu sesi kullanır. Mevcut
+              sesler cihaza ve tarayıcıya göre değişir; "online" olanlar
+              genelde daha doğal telaffuz eder.
+            </p>
+            <div className="flex flex-wrap items-end gap-2">
+              <Field label="Ses">
+                <Select
+                  value={voiceURI}
+                  onChange={(e) => handleVoiceChange(e.target.value)}
+                >
+                  <option value="">Otomatik (önerilen)</option>
+                  {voices.map((v) => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {v.name} ({v.lang}){v.localService ? '' : ' · online'}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  speak('Hello, this is a preview of this voice.')
+                }
+              >
+                <Volume2 size={16} /> Dinle
+              </Button>
+            </div>
+          </Card>
+        )}
+
         <Card>
-          <p className="mb-4 font-semibold text-slate-900 dark:text-slate-50">
+          <p className="mb-4 font-semibold text-slate-900 dark:text-zinc-50">
             Veri Yönetimi
           </p>
-          <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+          <p className="mb-4 text-sm text-slate-500 dark:text-zinc-400">
             Tüm verilerin bu tarayıcıda saklanır. Yedek al veya başka bir
             tarayıcıya taşımak için dışa/içe aktar.
           </p>

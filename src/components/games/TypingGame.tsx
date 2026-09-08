@@ -54,14 +54,14 @@ export function TypingGame({ words }: { words: Word[] }) {
   if (finished) {
     return (
       <Card className="mx-auto max-w-md text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+        <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
           Oyun bitti
         </p>
         <p className="mt-2 text-4xl font-bold text-indigo-600 dark:text-indigo-400">
           {score}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">puan</p>
-        <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-slate-500 dark:text-zinc-400">puan</p>
+        <p className="mt-3 text-sm text-slate-500 dark:text-zinc-400">
           En uzun seri: {bestStreak} · {answeredCount} / {pool.length} soru
         </p>
         <Button className="mx-auto mt-5" onClick={handleRestart}>
@@ -81,12 +81,12 @@ export function TypingGame({ words }: { words: Word[] }) {
             <Heart
               key={i}
               size={16}
-              className={i < lives ? 'text-red-500' : 'text-slate-300 dark:text-slate-700'}
+              className={i < lives ? 'text-red-500' : 'text-slate-300 dark:text-zinc-700'}
               fill={i < lives ? 'currentColor' : 'none'}
             />
           ))}
         </div>
-        <span className="font-medium text-slate-600 dark:text-slate-300">
+        <span className="font-medium text-slate-600 dark:text-zinc-300">
           Soru {index + 1} / {pool.length}
         </span>
         <span className="flex items-center gap-1 font-semibold text-amber-500">

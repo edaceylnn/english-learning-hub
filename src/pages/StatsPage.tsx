@@ -74,7 +74,7 @@ export function StatsPage() {
 
       <div className="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card>
-          <p className="mb-4 font-semibold text-slate-900 dark:text-slate-50">
+          <p className="mb-4 font-semibold text-slate-900 dark:text-zinc-50">
             Haftalık Eklenen Kelimeler
           </p>
           <div className="flex h-32 items-end justify-between gap-2">
@@ -93,7 +93,7 @@ export function StatsPage() {
         </Card>
 
         <Card>
-          <p className="mb-4 font-semibold text-slate-900 dark:text-slate-50">
+          <p className="mb-4 font-semibold text-slate-900 dark:text-zinc-50">
             Haftalık Tekrar Sayısı
           </p>
           <div className="flex h-32 items-end justify-between gap-2">
@@ -118,26 +118,26 @@ export function StatsPage() {
             <Flame size={26} />
           </div>
           <div>
-            <p className="text-2xl font-semibold text-slate-900 dark:text-slate-50">
+            <p className="text-2xl font-semibold text-slate-900 dark:text-zinc-50">
               {streak} gün
             </p>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-slate-500 dark:text-zinc-400">
               Günlük çalışma serisi
             </p>
           </div>
         </Card>
 
         <Card>
-          <p className="mb-3 font-semibold text-slate-900 dark:text-slate-50">
+          <p className="mb-3 font-semibold text-slate-900 dark:text-zinc-50">
             Tür Dağılımı
           </p>
           <div className="space-y-2">
             {Object.entries(typeDistribution).map(([type, count]) => (
               <div key={type} className="flex items-center gap-2">
-                <span className="w-24 shrink-0 text-xs text-slate-500 dark:text-slate-400">
+                <span className="w-24 shrink-0 text-xs text-slate-500 dark:text-zinc-400">
                   {wordTypeLabels[type as WordType]}
                 </span>
-                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100 dark:bg-zinc-800">
                   <div
                     className="h-full rounded-full bg-indigo-500"
                     style={{ width: `${(count / maxType) * 100}%` }}
@@ -156,10 +156,10 @@ export function StatsPage() {
       </div>
 
       <Card className="mt-5">
-        <p className="mb-1 font-semibold text-slate-900 dark:text-slate-50">
+        <p className="mb-1 font-semibold text-slate-900 dark:text-zinc-50">
           Başarımlar
         </p>
-        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mb-4 text-sm text-slate-500 dark:text-zinc-400">
           {unlockedIds.size} / {achievements.length} tamamlandı
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -172,19 +172,19 @@ export function StatsPage() {
                 className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-center ${
                   unlocked
                     ? 'border-amber-200 bg-amber-50 dark:border-amber-500/20 dark:bg-amber-500/10'
-                    : 'border-slate-200 bg-slate-50 opacity-60 dark:border-slate-800 dark:bg-slate-800/50'
+                    : 'border-slate-200 bg-slate-50 opacity-60 dark:border-zinc-800 dark:bg-zinc-800/50'
                 }`}
               >
                 <div
                   className={`flex h-10 w-10 items-center justify-center rounded-full ${
                     unlocked
                       ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400'
-                      : 'bg-slate-200 text-slate-400 dark:bg-slate-700 dark:text-slate-500'
+                      : 'bg-slate-200 text-slate-400 dark:bg-zinc-700 dark:text-zinc-500'
                   }`}
                 >
                   {unlocked ? <Icon size={18} /> : <Lock size={16} />}
                 </div>
-                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                <p className="text-xs font-semibold text-slate-700 dark:text-zinc-200">
                   {a.label}
                 </p>
                 <p className="text-[11px] text-slate-400">{a.description}</p>
@@ -200,7 +200,7 @@ export function StatsPage() {
 function StatCard({
   label,
   value,
-  tone = 'text-slate-900 dark:text-slate-50',
+  tone = 'text-slate-900 dark:text-zinc-50',
 }: {
   label: string;
   value: number;
@@ -209,7 +209,7 @@ function StatCard({
   return (
     <Card>
       <p className={`text-2xl font-semibold ${tone}`}>{value}</p>
-      <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+      <p className="mt-0.5 text-xs text-slate-500 dark:text-zinc-400">
         {label}
       </p>
     </Card>

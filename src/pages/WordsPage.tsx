@@ -1,5 +1,14 @@
 import { useMemo, useState } from 'react';
-import { ClipboardList, Plus, Search, Star, Trash2, Pencil } from 'lucide-react';
+import {
+  ClipboardList,
+  LayoutGrid,
+  List,
+  Plus,
+  Search,
+  Star,
+  Trash2,
+  Pencil,
+} from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { Word, WordStatus } from '../types';
 import {
@@ -42,6 +51,24 @@ export function WordsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<WordStatus | 'all'>('all');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    try {
+      return localStorage.getItem('english-study:words-view') === 'list'
+        ? 'list'
+        : 'grid';
+    } catch {
+      return 'grid';
+    }
+  });
+
+  function changeViewMode(mode: 'grid' | 'list') {
+    setViewMode(mode);
+    try {
+      localStorage.setItem('english-study:words-view', mode);
+    } catch {
+      // localStorage unavailable (e.g. private browsing) — preference just won't persist.
+    }
+  }
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -123,7 +150,33 @@ export function WordsPage() {
         title="Kelimeler"
         subtitle={`${words.length} kelime kayıtlı`}
         action={
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1 dark:bg-zinc-800">
+              <button
+                type="button"
+                title="Kart görünümü"
+                onClick={() => changeViewMode('grid')}
+                className={`rounded-md p-1.5 transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-indigo-600 shadow-sm dark:bg-zinc-700 dark:text-indigo-400'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-slate-200'
+                }`}
+              >
+                <LayoutGrid size={16} />
+              </button>
+              <button
+                type="button"
+                title="Liste görünümü"
+                onClick={() => changeViewMode('list')}
+                className={`rounded-md p-1.5 transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-white text-indigo-600 shadow-sm dark:bg-zinc-700 dark:text-indigo-400'
+                    : 'text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-slate-200'
+                }`}
+              >
+                <List size={16} />
+              </button>
+            </div>
             <Button variant="secondary" onClick={() => setBulkOpen(true)}>
               <ClipboardList size={16} /> Toplu Ekle
             </Button>
@@ -162,7 +215,7 @@ export function WordsPage() {
             ))}
           </Select>
         </div>
-        <label className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+        <label className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-zinc-300">
           <input
             type="checkbox"
             checked={favoritesOnly}
@@ -183,17 +236,17 @@ export function WordsPage() {
             </Button>
           }
         />
-      ) : (
+      ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((word) => (
             <Card key={word.id} className="flex flex-col gap-2">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-1">
                   <div>
-                    <p className="text-base font-semibold text-slate-900 dark:text-slate-50">
+                    <p className="text-base font-semibold text-slate-900 dark:text-zinc-50">
                       {word.term}
                     </p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm text-slate-500 dark:text-zinc-400">
                       {word.translation}
                     </p>
                   </div>
@@ -210,7 +263,7 @@ export function WordsPage() {
               </div>
 
               {word.example && (
-                <p className="text-sm italic text-slate-500 dark:text-slate-400">
+                <p className="text-sm italic text-slate-500 dark:text-zinc-400">
                   "{word.example}"
                 </p>
               )}
@@ -227,7 +280,7 @@ export function WordsPage() {
                 ))}
               </div>
 
-              <div className="mt-2 flex justify-end gap-1 border-t border-slate-100 pt-2 dark:border-slate-800">
+              <div className="mt-2 flex justify-end gap-1 border-t border-slate-100 pt-2 dark:border-zinc-800">
                 <Button variant="ghost" onClick={() => openEdit(word)}>
                   <Pencil size={14} /> Düzenle
                 </Button>
@@ -236,6 +289,57 @@ export function WordsPage() {
                 </Button>
               </div>
             </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
+          {filtered.map((word) => (
+            <div
+              key={word.id}
+              className="flex flex-wrap items-center gap-3 px-4 py-3"
+            >
+              <button
+                onClick={() => toggleFavoriteWord(word.id)}
+                className={`shrink-0 rounded-full p-1 hover:bg-slate-100 dark:hover:bg-slate-800 ${
+                  word.favorite ? 'text-amber-500' : 'text-slate-300'
+                }`}
+              >
+                <Star size={16} fill={word.favorite ? 'currentColor' : 'none'} />
+              </button>
+
+              <div className="flex min-w-[140px] flex-1 items-center gap-1">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-slate-900 dark:text-zinc-50">
+                    {word.term}
+                  </p>
+                  <p className="truncate text-sm text-slate-500 dark:text-zinc-400">
+                    {word.translation}
+                  </p>
+                </div>
+                <SpeakButton text={word.term} />
+              </div>
+
+              <div className="hidden flex-wrap items-center gap-1.5 sm:flex">
+                <Badge>{wordTypeLabels[word.type]}</Badge>
+                <Badge tone={wordStatusTone[word.status]}>
+                  {wordStatusLabels[word.status]}
+                </Badge>
+                {word.tags.map((tag) => (
+                  <Badge key={tag} tone="indigo">
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+
+              <div className="ml-auto flex shrink-0 gap-1">
+                <Button variant="ghost" onClick={() => openEdit(word)}>
+                  <Pencil size={14} />
+                </Button>
+                <Button variant="ghost" onClick={() => setDeleteId(word.id)}>
+                  <Trash2 size={14} className="text-red-500" />
+                </Button>
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -290,7 +394,7 @@ export function WordsPage() {
 
           <div className="flex items-center justify-between pt-2">
             {!editingId ? (
-              <label className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+              <label className="flex items-center gap-2 text-sm text-slate-500 dark:text-zinc-400">
                 <input
                   type="checkbox"
                   checked={keepAdding}
@@ -340,13 +444,13 @@ export function WordsPage() {
           </Field>
 
           {bulkRows.length > 0 && (
-            <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-slate-200 p-2 dark:border-slate-700">
+            <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-slate-200 p-2 dark:border-zinc-700">
               {bulkRows.map((row, i) => (
                 <div
                   key={i}
                   className={`flex items-center justify-between rounded px-2 py-1 text-sm ${
                     row.valid
-                      ? 'text-slate-600 dark:text-slate-300'
+                      ? 'text-slate-600 dark:text-zinc-300'
                       : 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400'
                   }`}
                 >
@@ -364,7 +468,7 @@ export function WordsPage() {
           )}
 
           <div className="flex items-center justify-between pt-2">
-            <span className="text-sm text-slate-500 dark:text-slate-400">
+            <span className="text-sm text-slate-500 dark:text-zinc-400">
               {bulkValidRows.length} kelime eklenecek
             </span>
             <div className="flex gap-2">

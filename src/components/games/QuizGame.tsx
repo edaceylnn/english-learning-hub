@@ -107,14 +107,14 @@ export function QuizGame({ words }: { words: Word[] }) {
   if (finished) {
     return (
       <Card className="mx-auto max-w-md text-center">
-        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+        <p className="text-sm font-medium text-slate-500 dark:text-zinc-400">
           Oyun bitti
         </p>
         <p className="mt-2 text-4xl font-bold text-indigo-600 dark:text-indigo-400">
           {score}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">puan</p>
-        <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-slate-500 dark:text-zinc-400">puan</p>
+        <p className="mt-3 text-sm text-slate-500 dark:text-zinc-400">
           En uzun seri: {bestStreak} · {answeredCount} / {pool.length} soru
         </p>
         <Button className="mx-auto mt-5" onClick={restart}>
@@ -129,17 +129,17 @@ export function QuizGame({ words }: { words: Word[] }) {
   return (
     <div className="mx-auto max-w-xl">
       <div className="mb-4 flex items-center justify-between text-sm">
-        <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-1 text-slate-500 dark:text-zinc-400">
           {Array.from({ length: START_LIVES }).map((_, i) => (
             <Heart
               key={i}
               size={16}
-              className={i < lives ? 'text-red-500' : 'text-slate-300 dark:text-slate-700'}
+              className={i < lives ? 'text-red-500' : 'text-slate-300 dark:text-zinc-700'}
               fill={i < lives ? 'currentColor' : 'none'}
             />
           ))}
         </div>
-        <span className="font-medium text-slate-600 dark:text-slate-300">
+        <span className="font-medium text-slate-600 dark:text-zinc-300">
           Soru {index + 1} / {pool.length}
         </span>
         <span className="flex items-center gap-1 font-semibold text-amber-500">
@@ -150,7 +150,7 @@ export function QuizGame({ words }: { words: Word[] }) {
       <Card className="mb-4 flex min-h-[120px] flex-col items-center justify-center text-center">
         <p className="text-xs text-slate-400">Bu kelimenin anlamı nedir?</p>
         <div className="mt-2 flex items-center gap-2">
-          <p className="text-3xl font-semibold text-slate-900 dark:text-slate-50">
+          <p className="text-3xl font-semibold text-slate-900 dark:text-zinc-50">
             {current.term}
           </p>
           <SpeakButton text={current.term} size={20} />
@@ -172,7 +172,7 @@ export function QuizGame({ words }: { words: Word[] }) {
                   ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
                   : isChosenWrong
                     ? 'border-red-500 bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
               }`}
             >
               <span className="mr-1.5 text-slate-400">{i + 1}.</span>

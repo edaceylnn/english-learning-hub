@@ -7,7 +7,6 @@ import {
   Card,
   EmptyState,
   PageHeader,
-  Select,
   SpeakButton,
 } from '../components/ui';
 import type { ReviewAnswer } from '../types';
@@ -29,24 +28,16 @@ export function ReviewPage() {
   const [flipped, setFlipped] = useState(false);
   const [sessionCount, setSessionCount] = useState(0);
   const [includeNew, setIncludeNew] = useState(true);
-  const [tagFilter, setTagFilter] = useState('all');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
-
-  const allTags = useMemo(() => {
-    const set = new Set<string>();
-    words.forEach((w) => w.tags.forEach((t) => set.add(t)));
-    return Array.from(set).sort();
-  }, [words]);
 
   const dueWords = useMemo(() => {
     const now = Date.now();
     return words
       .filter((w) => new Date(w.nextReviewAt).getTime() <= now)
       .filter((w) => includeNew || w.status !== 'new')
-      .filter((w) => tagFilter === 'all' || w.tags.includes(tagFilter))
       .filter((w) => !favoritesOnly || w.favorite)
       .sort((a, b) => a.nextReviewAt.localeCompare(b.nextReviewAt));
-  }, [words, includeNew, tagFilter, favoritesOnly]);
+  }, [words, includeNew, favoritesOnly]);
 
   const current = dueWords[0];
 
@@ -92,19 +83,7 @@ export function ReviewPage() {
       />
 
       <Card className="mb-5 flex flex-wrap items-center gap-4">
-        <Select
-          value={tagFilter}
-          onChange={(e) => setTagFilter(e.target.value)}
-          className="max-w-[180px]"
-        >
-          <option value="all">Tüm etiketler</option>
-          {allTags.map((tag) => (
-            <option key={tag} value={tag}>
-              {tag}
-            </option>
-          ))}
-        </Select>
-        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-zinc-300">
           <input
             type="checkbox"
             checked={favoritesOnly}
@@ -113,7 +92,7 @@ export function ReviewPage() {
           />
           Sadece favoriler
         </label>
-        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+        <label className="flex items-center gap-2 text-sm text-slate-600 dark:text-zinc-300">
           <input
             type="checkbox"
             checked={includeNew}
@@ -140,7 +119,7 @@ export function ReviewPage() {
         />
       ) : (
         <div className="mx-auto max-w-xl">
-          <div className="mb-3 flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+          <div className="mb-3 flex items-center justify-between text-sm text-slate-500 dark:text-zinc-400">
             <span>Sırada {dueWords.length} kelime var</span>
             <span>Bu oturumda: {sessionCount}</span>
           </div>
@@ -162,7 +141,7 @@ export function ReviewPage() {
                 <>
                   <Badge>{wordTypeLabels[current.type]}</Badge>
                   <div className="flex items-center gap-2">
-                    <p className="text-3xl font-semibold text-slate-900 dark:text-slate-50">
+                    <p className="text-3xl font-semibold text-slate-900 dark:text-zinc-50">
                       {current.term}
                     </p>
                     <SpeakButton text={current.term} size={20} />
@@ -183,7 +162,7 @@ export function ReviewPage() {
                     {current.translation}
                   </p>
                   {current.notes && (
-                    <p className="max-w-sm text-sm text-slate-500 dark:text-slate-400">
+                    <p className="max-w-sm text-sm text-slate-500 dark:text-zinc-400">
                       {current.notes}
                     </p>
                   )}

@@ -61,7 +61,7 @@ export function DashboardPage() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card>
           <div className="mb-3 flex items-center justify-between">
-            <p className="font-semibold text-slate-900 dark:text-slate-50">
+            <p className="font-semibold text-slate-900 dark:text-zinc-50">
               Bugünün Görevleri
             </p>
             <Link to="/todos" className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
@@ -74,7 +74,7 @@ export function DashboardPage() {
             <ul className="space-y-2">
               {todayTodos.map((t) => (
                 <li key={t.id} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-700 dark:text-slate-300">{t.title}</span>
+                  <span className="text-slate-700 dark:text-zinc-300">{t.title}</span>
                   <Badge>{t.priority}</Badge>
                 </li>
               ))}
@@ -84,7 +84,7 @@ export function DashboardPage() {
 
         <Card>
           <div className="mb-3 flex items-center justify-between">
-            <p className="font-semibold text-slate-900 dark:text-slate-50">
+            <p className="font-semibold text-slate-900 dark:text-zinc-50">
               Son Ders Notu
             </p>
             <Link to="/lessons" className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
@@ -96,11 +96,11 @@ export function DashboardPage() {
           ) : (
             <div>
               <p className="text-xs text-slate-400">{formatDate(latestLesson.date)}</p>
-              <p className="font-medium text-slate-800 dark:text-slate-200">
+              <p className="font-medium text-slate-800 dark:text-zinc-200">
                 {latestLesson.topic}
               </p>
               {latestLesson.learned && (
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
                   {latestLesson.learned}
                 </p>
               )}
@@ -111,7 +111,7 @@ export function DashboardPage() {
 
       <Card className="mt-5">
         <div className="mb-3 flex items-center justify-between">
-          <p className="font-semibold text-slate-900 dark:text-slate-50">
+          <p className="font-semibold text-slate-900 dark:text-zinc-50">
             Son Eklenen Kelimeler
           </p>
           <Link to="/words" className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
@@ -157,10 +157,10 @@ function SummaryCard({
     <Link to={to}>
       <Card className="transition-shadow hover:shadow-md">
         <Icon size={18} className="mb-2 text-indigo-500" />
-        <p className="text-xl font-semibold text-slate-900 dark:text-slate-50">
+        <p className="text-xl font-semibold text-slate-900 dark:text-zinc-50">
           {value}
         </p>
-        <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="text-xs text-slate-500 dark:text-zinc-400">{label}</p>
       </Card>
     </Link>
   );

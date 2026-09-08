@@ -149,7 +149,7 @@ export function NotesPage() {
               </option>
             ))}
           </Select>
-          <div className="flex overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+          <div className="flex overflow-hidden rounded-lg border border-slate-200 dark:border-zinc-700">
             <button
               onClick={() => setView('card')}
               className={`p-2 ${view === 'card' ? 'bg-indigo-600 text-white' : 'text-slate-500'}`}
@@ -188,7 +188,7 @@ export function NotesPage() {
             <Card key={note.id}>
               <div className="mb-2 flex items-start justify-between">
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-slate-50">
+                  <p className="font-semibold text-slate-900 dark:text-zinc-50">
                     {note.title}
                   </p>
                   <p className="text-xs text-slate-400">
@@ -205,7 +205,7 @@ export function NotesPage() {
                 </div>
               </div>
               <div
-                className="prose-sm max-w-none text-sm text-slate-600 dark:text-slate-300 [&_mark]:text-slate-900"
+                className="prose-sm max-w-none text-sm text-slate-600 dark:text-zinc-300 [&_mark]:text-slate-900"
                 dangerouslySetInnerHTML={{ __html: renderRichText(note.content) }}
               />
               <div className="mt-3 flex flex-wrap gap-1.5">
@@ -255,10 +255,10 @@ export function NotesPage() {
             </Field>
           </div>
           <div>
-            <span className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="mb-1 block text-xs font-medium text-slate-500 dark:text-zinc-400">
               İçerik
             </span>
-            <div className="mb-1 flex gap-1 rounded-t-lg border border-b-0 border-slate-200 bg-slate-50 p-1.5 dark:border-slate-700 dark:bg-slate-800">
+            <div className="mb-1 flex gap-1 rounded-t-lg border border-b-0 border-slate-200 bg-slate-50 p-1.5 dark:border-zinc-700 dark:bg-zinc-800">
               {[
                 { action: 'bold' as const, icon: Bold, title: 'Kalın' },
                 { action: 'italic' as const, icon: Italic, title: 'İtalik' },
@@ -271,7 +271,7 @@ export function NotesPage() {
                   type="button"
                   title={title}
                   onClick={() => format(action)}
-                  className="rounded p-1.5 text-slate-500 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700"
+                  className="rounded p-1.5 text-slate-500 hover:bg-slate-200 dark:text-zinc-300 dark:hover:bg-slate-700"
                 >
                   <Icon size={15} />
                 </button>

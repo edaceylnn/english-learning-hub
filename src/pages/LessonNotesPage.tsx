@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BookPlus, Plus, Trash2, Pencil, X } from 'lucide-react';
+import { BookPlus, Plus, Search, Trash2, Pencil, X } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import type { LessonNote } from '../types';
 import {
@@ -44,6 +44,7 @@ export function LessonNotesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
 
   const [importFor, setImportFor] = useState<LessonNote | null>(null);
   const [importRows, setImportRows] = useState<{ term: string; translation: string }[]>([
@@ -54,6 +55,18 @@ export function LessonNotesPage() {
     () => [...lessonNotes].sort((a, b) => (a.date < b.date ? 1 : -1)),
     [lessonNotes],
   );
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return sorted;
+    return sorted.filter(
+      (lesson) =>
+        lesson.topic.toLowerCase().includes(q) ||
+        lesson.learned.toLowerCase().includes(q) ||
+        lesson.teacherNotes.toLowerCase().includes(q) ||
+        lesson.exampleSentences.some((s) => s.toLowerCase().includes(q)),
+    );
+  }, [sorted, search]);
 
   function openAdd() {
     setEditingId(null);
@@ -125,64 +138,93 @@ export function LessonNotesPage() {
           }
         />
       ) : (
-        <div className="space-y-3">
-          {sorted.map((lesson) => (
-            <Card key={lesson.id}>
-              <div className="mb-2 flex items-start justify-between">
-                <div>
-                  <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                    {formatDate(lesson.date)}
-                  </p>
-                  <p className="text-base font-semibold text-slate-900 dark:text-slate-50">
-                    {lesson.topic}
-                  </p>
-                </div>
-                <div className="flex gap-1">
-                  <Button variant="ghost" onClick={() => openImport(lesson)}>
-                    <BookPlus size={14} /> Kelimeleri Aktar
-                  </Button>
-                  <Button variant="ghost" onClick={() => openEdit(lesson)}>
-                    <Pencil size={14} />
-                  </Button>
-                  <Button variant="ghost" onClick={() => setDeleteId(lesson.id)}>
-                    <Trash2 size={14} className="text-red-500" />
-                  </Button>
-                </div>
-              </div>
+        <>
+          <Card className="mb-5">
+            <div className="relative">
+              <Search
+                size={16}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+              <Input
+                placeholder="Konu, öğrenilenler veya notlarda ara..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </Card>
 
-              {lesson.learned && (
-                <p className="mb-2 text-sm text-slate-600 dark:text-slate-300">
-                  <span className="font-medium">Öğrendiklerim: </span>
-                  {lesson.learned}
-                </p>
-              )}
+          {filtered.length === 0 ? (
+            <EmptyState
+              title="Sonuç bulunamadı"
+              description="Farklı bir kelime dene veya aramayı temizle."
+              action={
+                <Button variant="secondary" onClick={() => setSearch('')}>
+                  Aramayı Temizle
+                </Button>
+              }
+            />
+          ) : (
+            <div className="space-y-3">
+              {filtered.map((lesson) => (
+                <Card key={lesson.id}>
+                  <div className="mb-2 flex items-start justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                        {formatDate(lesson.date)}
+                      </p>
+                      <p className="text-base font-semibold text-slate-900 dark:text-zinc-50">
+                        {lesson.topic}
+                      </p>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" onClick={() => openImport(lesson)}>
+                        <BookPlus size={14} /> Kelimeleri Aktar
+                      </Button>
+                      <Button variant="ghost" onClick={() => openEdit(lesson)}>
+                        <Pencil size={14} />
+                      </Button>
+                      <Button variant="ghost" onClick={() => setDeleteId(lesson.id)}>
+                        <Trash2 size={14} className="text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
 
-              {lesson.exampleSentences.length > 0 && (
-                <ul className="mb-2 list-disc space-y-0.5 pl-5 text-sm italic text-slate-500 dark:text-slate-400">
-                  {lesson.exampleSentences.map((s, i) => (
-                    <li key={i}>{s}</li>
-                  ))}
-                </ul>
-              )}
+                  {lesson.learned && (
+                    <p className="mb-2 text-sm text-slate-600 dark:text-zinc-300">
+                      <span className="font-medium">Öğrendiklerim: </span>
+                      {lesson.learned}
+                    </p>
+                  )}
 
-              {lesson.teacherNotes && (
-                <p className="mb-2 rounded-lg bg-slate-50 p-2 text-sm text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  <span className="font-medium">Öğretmen notu: </span>
-                  {lesson.teacherNotes}
-                </p>
-              )}
+                  {lesson.exampleSentences.length > 0 && (
+                    <ul className="mb-2 list-disc space-y-0.5 pl-5 text-sm italic text-slate-500 dark:text-zinc-400">
+                      {lesson.exampleSentences.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                  )}
 
-              {lesson.newWordIds.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {lesson.newWordIds.map((id) => {
-                    const w = words.find((word) => word.id === id);
-                    return w ? <Badge key={id} tone="indigo">{w.term}</Badge> : null;
-                  })}
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
+                  {lesson.teacherNotes && (
+                    <p className="mb-2 rounded-lg bg-slate-50 p-2 text-sm text-slate-600 dark:bg-zinc-800 dark:text-zinc-300">
+                      <span className="font-medium">Öğretmen notu: </span>
+                      {lesson.teacherNotes}
+                    </p>
+                  )}
+
+                  {lesson.newWordIds.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {lesson.newWordIds.map((id) => {
+                        const w = words.find((word) => word.id === id);
+                        return w ? <Badge key={id} tone="indigo">{w.term}</Badge> : null;
+                      })}
+                    </div>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <Modal

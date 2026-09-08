@@ -50,7 +50,7 @@ export function CalendarPage() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-base font-semibold capitalize text-slate-900 dark:text-slate-50">
+            <p className="text-base font-semibold capitalize text-slate-900 dark:text-zinc-50">
               {format(month, 'MMMM yyyy', { locale: tr })}
             </p>
             <div className="flex gap-1">
@@ -95,7 +95,7 @@ export function CalendarPage() {
                     className={`mb-1 flex h-5 w-5 items-center justify-center rounded-full ${
                       isToday(day)
                         ? 'bg-indigo-600 text-white'
-                        : 'text-slate-600 dark:text-slate-300'
+                        : 'text-slate-600 dark:text-zinc-300'
                     }`}
                   >
                     {format(day, 'd')}
@@ -120,7 +120,7 @@ export function CalendarPage() {
         </Card>
 
         <Card>
-          <p className="mb-3 font-semibold text-slate-900 dark:text-slate-50">
+          <p className="mb-3 font-semibold text-slate-900 dark:text-zinc-50">
             {format(selected, 'd MMMM yyyy, EEEE', { locale: tr })}
           </p>
 
@@ -150,7 +150,7 @@ export function CalendarPage() {
                   <p className="mb-1 text-xs font-semibold uppercase text-slate-400">
                     Ders Notları
                   </p>
-                  <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                  <ul className="space-y-1 text-sm text-slate-600 dark:text-zinc-300">
                     {selectedEvents.lessons.map((l) => (
                       <li key={l.id}>{l.topic}</li>
                     ))}
@@ -177,7 +177,7 @@ export function CalendarPage() {
                   <p className="mb-1 text-xs font-semibold uppercase text-slate-400">
                     Notlar
                   </p>
-                  <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                  <ul className="space-y-1 text-sm text-slate-600 dark:text-zinc-300">
                     {selectedEvents.dayNotes.map((n) => (
                       <li key={n.id}>{n.title}</li>
                     ))}

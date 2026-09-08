@@ -104,7 +104,7 @@ export function TodosPage() {
             className={`rounded-full px-3 py-1.5 text-sm font-medium ${
               statusFilter === s
                 ? 'bg-indigo-600 text-white'
-                : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                : 'bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-zinc-300'
             }`}
           >
             {s === 'all' ? 'Tümü' : todoStatusLabels[s]}
@@ -132,7 +132,7 @@ export function TodosPage() {
                     ? 'border-emerald-500 bg-emerald-500 text-white'
                     : todo.status === 'in-progress'
                       ? 'border-amber-500'
-                      : 'border-slate-300 dark:border-slate-600'
+                      : 'border-slate-300 dark:border-zinc-600'
                 }`}
                 title="Durumu değiştir"
               >
@@ -144,7 +144,7 @@ export function TodosPage() {
                     className={`font-medium ${
                       todo.status === 'done'
                         ? 'text-slate-400 line-through'
-                        : 'text-slate-900 dark:text-slate-50'
+                        : 'text-slate-900 dark:text-zinc-50'
                     }`}
                   >
                     {todo.title}
@@ -159,7 +159,7 @@ export function TodosPage() {
                   </div>
                 </div>
                 {todo.description && (
-                  <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                  <p className="mt-0.5 text-sm text-slate-500 dark:text-zinc-400">
                     {todo.description}
                   </p>
                 )}

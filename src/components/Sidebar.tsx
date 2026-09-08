@@ -42,7 +42,7 @@ export function Sidebar({
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-200 dark:border-slate-800 dark:bg-slate-900 lg:static lg:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-200 dark:border-zinc-800 dark:bg-zinc-900 lg:static lg:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
@@ -54,7 +54,7 @@ export function Sidebar({
           <p className="text-sm font-semibold leading-tight">
             English Study
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-zinc-400">
             Workspace
           </p>
         </div>
@@ -71,7 +71,7 @@ export function Sidebar({
               `flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
                   ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300'
-                  : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                  : 'text-slate-600 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-slate-800'
               }`
             }
           >
@@ -88,14 +88,14 @@ export function Sidebar({
         ))}
       </nav>
 
-      <div className="border-t border-slate-200 p-3 dark:border-slate-800">
+      <div className="border-t border-slate-200 p-3 dark:border-zinc-800">
         <button
           onClick={() =>
             updateSettings({
               theme: settings.theme === 'dark' ? 'light' : 'dark',
             })
           }
-          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:text-zinc-300 dark:hover:bg-slate-800"
         >
           {settings.theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
           {settings.theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
