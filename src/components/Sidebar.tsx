@@ -6,15 +6,18 @@ import {
   Gamepad2,
   LayoutDashboard,
   ListChecks,
+  LogOut,
   Moon,
   NotebookPen,
   Repeat,
   Settings as SettingsIcon,
+  Sparkles,
   StickyNote,
   Sun,
   BarChart3,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 
 type NavItem = {
   to: string;
@@ -59,6 +62,7 @@ export function Sidebar({
   onNavigate: () => void;
 }) {
   const { settings, updateSettings, words } = useApp();
+  const { scope, logout } = useAuth();
   const dueCount = words.filter(
     (w) => new Date(w.nextReviewAt).getTime() <= Date.now(),
   ).length;
@@ -82,6 +86,13 @@ export function Sidebar({
           </p>
         </div>
       </div>
+
+      {scope === 'demo' && (
+        <div className="mx-3 mt-3 flex items-center gap-1.5 rounded-[10px] border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
+          <Sparkles size={13} className="shrink-0" />
+          Demo modu — veriler periyodik sıfırlanır
+        </div>
+      )}
 
       <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
         {navGroups.map((group) => (
@@ -152,6 +163,15 @@ export function Sidebar({
               <Moon size={18} />
             )}
             {settings.theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
+          </span>
+        </button>
+        <button
+          onClick={() => logout()}
+          className={`${navLinkClasses} w-full text-muted hover:bg-surface-hover hover:text-foreground`}
+        >
+          <span className="flex items-center gap-2.5">
+            <LogOut size={18} />
+            Çıkış Yap
           </span>
         </button>
       </div>

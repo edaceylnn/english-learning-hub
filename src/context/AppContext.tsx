@@ -117,6 +117,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement;
     if (settings.theme === 'dark') root.classList.add('dark');
     else root.classList.remove('dark');
+    try {
+      localStorage.setItem('theme', settings.theme);
+    } catch {
+      // localStorage unavailable — the login screen just won't match on next visit.
+    }
   }, [settings.theme]);
 
   const value = useMemo<AppContextValue>(

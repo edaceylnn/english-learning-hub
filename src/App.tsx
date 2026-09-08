@@ -12,8 +12,33 @@ import { TodosPage } from './pages/TodosPage';
 import { CalendarPage } from './pages/CalendarPage';
 import { StatsPage } from './pages/StatsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { LoginPage } from './pages/LoginPage';
+import { useAuth } from './context/AuthContext';
+import { AppProvider } from './context/AppContext';
 
 function App() {
+  const { status } = useAuth();
+
+  if (status === 'checking') {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted">Yükleniyor…</p>
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    return <LoginPage />;
+  }
+
+  return (
+    <AppProvider>
+      <AppShell />
+    </AppProvider>
+  );
+}
+
+function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (

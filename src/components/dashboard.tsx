@@ -96,17 +96,23 @@ export function PrimaryButton({
   to,
   onClick,
   variant = 'primary',
+  type = 'button',
+  disabled,
+  className = '',
 }: {
   children: ReactNode;
   to?: string;
   onClick?: () => void;
   variant?: 'primary' | 'secondary';
+  type?: 'button' | 'submit';
+  disabled?: boolean;
+  className?: string;
 }) {
-  const classes = `inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[10px] px-5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+  const classes = `inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[10px] px-5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 ${
     variant === 'primary'
       ? 'bg-primary text-white hover:bg-primary-hover'
       : 'border border-border bg-surface text-foreground hover:bg-surface-hover'
-  }`;
+  } ${className}`;
   if (to) {
     return (
       <Link to={to} className={classes}>
@@ -115,7 +121,7 @@ export function PrimaryButton({
     );
   }
   return (
-    <button type="button" onClick={onClick} className={classes}>
+    <button type={type} disabled={disabled} onClick={onClick} className={classes}>
       {children}
     </button>
   );
