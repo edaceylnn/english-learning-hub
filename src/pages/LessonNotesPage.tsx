@@ -12,6 +12,7 @@ import {
   Input,
   Modal,
   PageHeader,
+  PaginationControls,
   Textarea,
 } from '../components/ui';
 import { formatDate } from '../lib/labels';
@@ -36,6 +37,8 @@ const emptyForm: FormState = {
   teacherNotes: '',
 };
 
+const LESSON_NOTES_PAGE_SIZE = 8;
+
 export function LessonNotesPage() {
   const { lessonNotes, addLessonNote, updateLessonNote, deleteLessonNote, importWordsFromLesson, words } =
     useApp();
@@ -45,6 +48,8 @@ export function LessonNotesPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const [importFor, setImportFor] = useState<LessonNote | null>(null);
   const [importRows, setImportRows] = useState<{ term: string; translation: string }[]>([
@@ -67,6 +72,25 @@ export function LessonNotesPage() {
         lesson.exampleSentences.some((s) => s.toLowerCase().includes(q)),
     );
   }, [sorted, search]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / LESSON_NOTES_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const paginatedLessons = useMemo(
+    () =>
+      filtered.slice(
+        (safePage - 1) * LESSON_NOTES_PAGE_SIZE,
+        safePage * LESSON_NOTES_PAGE_SIZE,
+      ),
+    [filtered, safePage],
+  );
+
+  const selectedLesson = useMemo(
+    () =>
+      paginatedLessons.find((lesson) => lesson.id === selectedId) ??
+      paginatedLessons[0] ??
+      null,
+    [paginatedLessons, selectedId],
+  );
 
   function openAdd() {
     setEditingId(null);
@@ -148,7 +172,10 @@ export function LessonNotesPage() {
               <Input
                 placeholder="Konu, öğrenilenler veya notlarda ara..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
                 className="pl-9"
               />
             </div>
@@ -165,64 +192,162 @@ export function LessonNotesPage() {
               }
             />
           ) : (
-            <div className="space-y-3">
-              {filtered.map((lesson) => (
-                <Card key={lesson.id}>
-                  <div className="mb-2 flex items-start justify-between">
+            <>
+              <div className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(420px,1.25fr)]">
+              <div className="space-y-3">
+                {paginatedLessons.map((lesson) => {
+                  const active = selectedLesson?.id === lesson.id;
+                  return (
+                    <Card
+                      key={lesson.id}
+                      className={`cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/30 ${
+                        active
+                          ? 'border-primary/35 ring-2 ring-primary/10'
+                          : ''
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setSelectedId(lesson.id)}
+                        className="block w-full text-left focus-visible:outline-none"
+                      >
+                        <div className="mb-2 flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                              {formatDate(lesson.date)}
+                            </p>
+                            <p className="truncate text-base font-semibold text-slate-900 dark:text-zinc-50">
+                              {lesson.topic}
+                            </p>
+                          </div>
+                        </div>
+
+                        {lesson.learned && (
+                          <p className="line-clamp-3 text-sm leading-6 text-slate-600 dark:text-zinc-300">
+                            {lesson.learned}
+                          </p>
+                        )}
+
+                        {lesson.teacherNotes && (
+                          <p className="mt-2 line-clamp-2 rounded-lg bg-slate-50 p-2 text-sm text-slate-500 dark:bg-zinc-800 dark:text-zinc-400">
+                            {lesson.teacherNotes}
+                          </p>
+                        )}
+                      </button>
+
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
+                        <div className="flex flex-wrap gap-1.5">
+                          {lesson.newWordIds.slice(0, 3).map((id) => {
+                            const w = words.find((word) => word.id === id);
+                            return w ? <Badge key={id} tone="indigo">{w.term}</Badge> : null;
+                          })}
+                          {lesson.newWordIds.length > 3 && (
+                            <Badge tone="slate">+{lesson.newWordIds.length - 3}</Badge>
+                          )}
+                        </div>
+                        <div className="flex gap-1">
+                          <Button variant="ghost" onClick={() => openImport(lesson)}>
+                            <BookPlus size={14} /> Aktar
+                          </Button>
+                          <Button variant="ghost" onClick={() => openEdit(lesson)}>
+                            <Pencil size={14} />
+                          </Button>
+                          <Button variant="ghost" onClick={() => setDeleteId(lesson.id)}>
+                            <Trash2 size={14} className="text-red-500" />
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {selectedLesson && (
+                <Card className="xl:sticky xl:top-4 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto">
+                  <div className="mb-5 flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
                     <div>
                       <p className="text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                        {formatDate(lesson.date)}
+                        {formatDate(selectedLesson.date)}
                       </p>
-                      <p className="text-base font-semibold text-slate-900 dark:text-zinc-50">
-                        {lesson.topic}
-                      </p>
+                      <h2 className="mt-1 text-2xl font-bold text-slate-950 dark:text-zinc-50">
+                        {selectedLesson.topic}
+                      </h2>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" onClick={() => openImport(lesson)}>
+                      <Button variant="ghost" onClick={() => openImport(selectedLesson)}>
                         <BookPlus size={14} /> Kelimeleri Aktar
                       </Button>
-                      <Button variant="ghost" onClick={() => openEdit(lesson)}>
+                      <Button variant="ghost" onClick={() => openEdit(selectedLesson)}>
                         <Pencil size={14} />
-                      </Button>
-                      <Button variant="ghost" onClick={() => setDeleteId(lesson.id)}>
-                        <Trash2 size={14} className="text-red-500" />
                       </Button>
                     </div>
                   </div>
 
-                  {lesson.learned && (
-                    <p className="mb-2 text-sm text-slate-600 dark:text-zinc-300">
-                      <span className="font-medium">Öğrendiklerim: </span>
-                      {lesson.learned}
-                    </p>
-                  )}
+                  <div className="space-y-5">
+                    <section>
+                      <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500">
+                        Öğrendiklerim
+                      </h3>
+                      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-700 dark:text-zinc-300">
+                        {selectedLesson.learned || 'Bu alan boş.'}
+                      </p>
+                    </section>
 
-                  {lesson.exampleSentences.length > 0 && (
-                    <ul className="mb-2 list-disc space-y-0.5 pl-5 text-sm italic text-slate-500 dark:text-zinc-400">
-                      {lesson.exampleSentences.map((s, i) => (
-                        <li key={i}>{s}</li>
-                      ))}
-                    </ul>
-                  )}
+                    <section>
+                      <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500">
+                        Örnek Cümleler
+                      </h3>
+                      {selectedLesson.exampleSentences.length > 0 ? (
+                        <ul className="space-y-2 text-sm italic leading-7 text-slate-600 dark:text-zinc-300">
+                          {selectedLesson.exampleSentences.map((sentence, index) => (
+                            <li
+                              key={index}
+                              className="rounded-lg border border-border bg-surface-hover px-3 py-2"
+                            >
+                              {sentence}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted">Örnek cümle yok.</p>
+                      )}
+                    </section>
 
-                  {lesson.teacherNotes && (
-                    <p className="mb-2 rounded-lg bg-slate-50 p-2 text-sm text-slate-600 dark:bg-zinc-800 dark:text-zinc-300">
-                      <span className="font-medium">Öğretmen notu: </span>
-                      {lesson.teacherNotes}
-                    </p>
-                  )}
+                    <section>
+                      <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500">
+                        Öğretmen Notu
+                      </h3>
+                      <p className="whitespace-pre-wrap rounded-lg border border-border bg-surface-hover p-3 text-sm leading-7 text-slate-700 dark:text-zinc-300">
+                        {selectedLesson.teacherNotes || 'Bu alan boş.'}
+                      </p>
+                    </section>
 
-                  {lesson.newWordIds.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {lesson.newWordIds.map((id) => {
-                        const w = words.find((word) => word.id === id);
-                        return w ? <Badge key={id} tone="indigo">{w.term}</Badge> : null;
-                      })}
-                    </div>
-                  )}
+                    {selectedLesson.newWordIds.length > 0 && (
+                      <section>
+                        <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-zinc-500">
+                          Aktarılan Kelimeler
+                        </h3>
+                        <div className="flex flex-wrap gap-1.5">
+                          {selectedLesson.newWordIds.map((id) => {
+                            const w = words.find((word) => word.id === id);
+                            return w ? <Badge key={id} tone="indigo">{w.term}</Badge> : null;
+                          })}
+                        </div>
+                      </section>
+                    )}
+                  </div>
                 </Card>
-              ))}
-            </div>
+              )}
+              </div>
+
+              <PaginationControls
+                page={safePage}
+                pageCount={pageCount}
+                total={filtered.length}
+                pageSize={LESSON_NOTES_PAGE_SIZE}
+                onPageChange={setPage}
+              />
+            </>
           )}
         </>
       )}

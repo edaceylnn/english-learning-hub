@@ -36,7 +36,7 @@ export function DashboardCard({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-border bg-surface p-5 sm:p-6 ${className}`}
+      className={`rounded-lg border border-slate-200/90 bg-white/[0.94] p-5 shadow-[0_22px_55px_rgba(15,23,42,0.10)] backdrop-blur sm:p-6 dark:border-white/10 dark:bg-zinc-900/[0.88] dark:shadow-black/25 ${className}`}
     >
       {children}
     </div>
@@ -59,9 +59,11 @@ export function StatCard({
   return (
     <Link
       to={to}
-      className="rounded-2xl border border-border bg-surface p-5 transition-colors duration-150 hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      className="group relative overflow-hidden rounded-lg border border-slate-200/90 bg-white/[0.95] p-5 shadow-[0_22px_55px_rgba(15,23,42,0.10)] backdrop-blur transition-all duration-150 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_26px_65px_rgba(79,70,229,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:border-white/10 dark:bg-zinc-900/[0.88] dark:shadow-black/25"
     >
-      <Icon size={18} className="mb-3 text-primary" />
+      <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+        <Icon size={18} />
+      </div>
       <p className="text-[28px] font-semibold leading-none text-foreground">
         {value}
       </p>
@@ -110,8 +112,8 @@ export function PrimaryButton({
 }) {
   const classes = `inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-[10px] px-5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50 ${
     variant === 'primary'
-      ? 'bg-primary text-white hover:bg-primary-hover'
-      : 'border border-border bg-surface text-foreground hover:bg-surface-hover'
+      ? 'bg-primary text-white shadow-[0_12px_30px_rgba(79,70,229,0.22)] hover:-translate-y-px hover:bg-primary-hover dark:bg-white dark:text-slate-950 dark:hover:bg-indigo-100'
+      : 'border border-border bg-surface/90 text-foreground shadow-sm hover:-translate-y-px hover:bg-surface-hover'
   } ${className}`;
   if (to) {
     return (

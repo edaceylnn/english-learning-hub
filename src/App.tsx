@@ -41,7 +41,9 @@ function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-background">
+    <div className="relative flex h-screen w-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.16),transparent_32%),linear-gradient(135deg,var(--background)_0%,var(--background)_48%,rgba(20,184,166,0.08)_100%)] text-foreground">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.035)_1px,transparent_1px)] bg-[size:28px_28px] dark:bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)]" />
+
       <Sidebar open={sidebarOpen} onNavigate={() => setSidebarOpen(false)} />
 
       {sidebarOpen && (
@@ -52,7 +54,7 @@ function AppShell() {
         />
       )}
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative z-10 flex min-w-0 flex-1 flex-col">
         <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-3 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -66,7 +68,7 @@ function AppShell() {
           </span>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="relative flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[1360px] p-4 sm:p-6 lg:p-8">
             <Routes>
               <Route path="/" element={<DashboardPage />} />

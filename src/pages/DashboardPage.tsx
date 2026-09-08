@@ -9,6 +9,7 @@ import {
   ListChecks,
   Plus,
   Repeat,
+  Sparkles,
   StickyNote,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -37,6 +38,9 @@ export function DashboardPage() {
   );
   const learned = words.filter((w) => w.status === 'learned').length;
   const latestLesson = lessonNotes[0];
+  const todayPractice = reviewLog.filter((r) =>
+    isSameDay(new Date(r.reviewedAt), new Date()),
+  ).length;
 
   const weekAgo = Date.now() - WEEK_MS;
   const wordsThisWeek = words.filter(
@@ -58,19 +62,37 @@ export function DashboardPage() {
 
   return (
     <div>
-      <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
+      <div className="relative z-10 mb-6 overflow-hidden rounded-lg border border-indigo-100/80 bg-white/[0.86] p-6 text-slate-950 shadow-[0_24px_70px_rgba(79,70,229,0.12)] backdrop-blur dark:border-slate-950/10 dark:bg-slate-950 dark:text-white dark:shadow-[0_24px_70px_rgba(15,23,42,0.22)] sm:p-8">
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-400 via-cyan-300 to-amber-300" />
+        <div className="absolute right-0 top-0 h-full w-2/5 bg-[linear-gradient(135deg,rgba(99,102,241,0.12),rgba(20,184,166,0.09)_45%,rgba(245,158,11,0.10))] dark:bg-[linear-gradient(135deg,rgba(99,102,241,0.25),rgba(20,184,166,0.16)_45%,rgba(245,158,11,0.18))]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_16%,rgba(99,102,241,0.08),transparent_30%),radial-gradient(circle_at_85%_20%,rgba(20,184,166,0.08),transparent_28%)] dark:bg-none" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 dark:border-white/10 dark:bg-white/[0.08] dark:text-cyan-100">
+              <Sparkles size={13} /> English practice cockpit
+            </span>
+            <h1 className="mt-5 max-w-xl text-4xl font-black leading-[1.02] text-slate-950 dark:text-white sm:text-5xl">
+              Merhaba{settings.displayName ? `, ${settings.displayName}` : ''}.
+            </h1>
+            <p className="mt-4 max-w-lg text-sm leading-6 text-slate-600 dark:text-white/66">
+              Kelimelerini oyunlarla döndür, notlarını toparla ve günlük çalışma ritmini canlı tut.
+            </p>
+          </div>
+          <div className="grid w-full grid-cols-3 gap-2 sm:max-w-md">
+            <HeroMetric label="Kelime" value={words.length} />
+            <HeroMetric label="Bugün" value={todayPractice} />
+            <HeroMetric label="Seri" value={streak} />
+          </div>
+        </div>
+      </div>
+
+      <div className="relative z-10 mb-7 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-[28px] font-semibold leading-tight text-foreground">
-            Merhaba{settings.displayName ? `, ${settings.displayName}` : ''} 👋
-          </h1>
-          <p className="mt-1 text-sm text-muted">
-            Bugün İngilizcene birkaç dakika ayırmaya hazır mısın?
+          <p className="text-sm font-semibold text-muted">
+            {dateLabel}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden text-sm capitalize text-muted sm:inline">
-            {dateLabel}
-          </span>
           {streak > 0 && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-foreground">
               <Flame size={14} className="text-amber-500" /> {streak} gün
@@ -83,14 +105,16 @@ export function DashboardPage() {
       </div>
 
       {words.length > 0 ? (
-        <div className="relative mb-6 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-surface to-surface p-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="relative z-10 mb-8 overflow-hidden rounded-lg border border-primary/20 bg-gradient-to-br from-white via-indigo-50 to-cyan-50 p-6 shadow-[0_18px_50px_rgba(79,70,229,0.16)] dark:from-zinc-900 dark:via-indigo-950/30 dark:to-cyan-950/20">
+          <div className="pointer-events-none absolute right-6 top-6 z-0 hidden h-24 w-24 rotate-6 rounded-[22px] border border-indigo-200/60 bg-white/70 shadow-sm sm:block dark:border-white/10 dark:bg-white/5" />
+          <div className="pointer-events-none absolute right-12 top-14 z-0 hidden h-20 w-20 -rotate-12 rounded-[20px] border border-amber-200/70 bg-amber-100/70 shadow-sm sm:block dark:border-amber-400/20 dark:bg-amber-400/10" />
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary text-white shadow-lg shadow-indigo-500/20 dark:bg-white dark:text-slate-950">
                 <Gamepad2 size={20} />
               </div>
               <div>
-                <p className="text-[15px] font-semibold text-foreground">
+                <p className="text-lg font-bold text-foreground">
                   Oyun pratiği
                 </p>
                 <p className="mt-0.5 text-sm text-foreground/90">
@@ -107,9 +131,9 @@ export function DashboardPage() {
           </div>
         </div>
       ) : (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-surface p-6">
+        <div className="relative z-10 mb-8 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-surface/88 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
               <Check size={20} />
             </div>
             <div>
@@ -127,7 +151,7 @@ export function DashboardPage() {
         </div>
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="relative z-10 mb-8 grid grid-cols-2 gap-5 lg:grid-cols-4">
         <StatCard
           icon={BookOpen}
           label="Toplam Kelime"
@@ -157,7 +181,7 @@ export function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div className="relative z-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <DashboardCard>
           <SectionHeader title="Bugünün Görevleri" to="/todos" />
           {todayTodos.length === 0 ? (
@@ -208,7 +232,7 @@ export function DashboardPage() {
           onKeyDown={(e) => {
             if (e.key === 'Enter') navigate('/lessons');
           }}
-          className="cursor-pointer rounded-2xl border border-border bg-surface p-5 transition-colors duration-150 hover:border-primary/30 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:p-6"
+          className="cursor-pointer rounded-lg border border-border/80 bg-surface/88 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:p-6"
         >
           <SectionHeader title="Son Ders Notu" to="/lessons" />
           {!latestLesson ? (
@@ -237,7 +261,7 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <DashboardCard className="mt-5">
+      <DashboardCard className="relative z-10 mt-5">
         <SectionHeader title="Son Eklenen Kelimeler" to="/words" />
         {words.length === 0 ? (
           <p className="text-sm text-muted">Henüz kelime eklenmedi.</p>
@@ -255,7 +279,7 @@ export function DashboardPage() {
         )}
       </DashboardCard>
 
-      <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div className="relative z-10 mt-5 flex flex-col gap-4 rounded-lg border border-border bg-surface/88 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:p-6">
         <div>
           <p className="text-[15px] font-semibold text-foreground">
             Yaklaşan Çalışma
@@ -287,6 +311,17 @@ export function DashboardPage() {
           Takvimi Gör <ArrowRight size={15} />
         </Link>
       </div>
+    </div>
+  );
+}
+
+function HeroMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-indigo-100/90 bg-white/70 p-3 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.08]">
+      <p className="text-2xl font-black leading-none text-slate-950 dark:text-white">{value}</p>
+      <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/45">
+        {label}
+      </p>
     </div>
   );
 }

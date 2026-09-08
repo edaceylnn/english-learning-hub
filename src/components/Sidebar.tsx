@@ -51,7 +51,13 @@ const navGroups: { label: string; items: NavItem[] }[] = [
 ];
 
 const navLinkClasses =
-  'group flex h-9 items-center justify-between gap-2 rounded-[10px] px-3 text-[13px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
+  'group flex h-10 items-center justify-between gap-2 rounded-lg px-3 text-[13px] font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/35 dark:focus-visible:ring-white/30';
+
+const activeNavClasses =
+  'border border-indigo-200/70 bg-indigo-500/[0.08] text-slate-950 shadow-[0_10px_24px_rgba(79,70,229,0.08)] dark:border-indigo-300/18 dark:bg-indigo-500/[0.12] dark:text-white dark:shadow-none';
+
+const idleNavClasses =
+  'text-slate-500 hover:bg-slate-950/[0.04] hover:text-slate-950 dark:text-white/58 dark:hover:bg-white/[0.07] dark:hover:text-white';
 
 export function Sidebar({
   open,
@@ -65,25 +71,25 @@ export function Sidebar({
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-border bg-surface transition-transform duration-200 lg:static lg:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 flex-col border-r border-slate-200/80 bg-white/[0.84] text-slate-950 shadow-[24px_0_70px_rgba(15,23,42,0.12)] backdrop-blur-xl transition-transform duration-200 dark:border-white/10 dark:bg-[#151517] dark:text-white dark:shadow-[24px_0_70px_rgba(0,0,0,0.24)] lg:sticky lg:inset-y-auto lg:left-auto lg:top-4 lg:m-4 lg:h-[calc(100vh-2rem)] lg:translate-x-0 lg:rounded-[28px] lg:border ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
-      <div className="flex items-center gap-3 border-b border-border px-5 py-5">
+      <div className="flex items-center gap-3 border-b border-slate-200/80 px-5 py-5 dark:border-white/10">
         <BrandLogo className="h-9 w-9 shrink-0 drop-shadow-sm" />
         <div className="min-w-0">
-          <p className="truncate text-[15px] font-semibold leading-tight text-foreground">
+          <p className="truncate text-[15px] font-bold leading-tight text-slate-950 dark:text-white">
             English Study
           </p>
-          <p className="text-[11px] font-medium uppercase tracking-wide text-muted">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/45">
             Workspace
           </p>
         </div>
       </div>
 
       {scope === 'demo' && (
-        <div className="mx-3 mt-3 flex items-center gap-1.5 rounded-lg border border-border bg-surface-hover/60 px-2.5 py-1.5 text-[11px] font-medium text-muted">
-          <Sparkles size={11} className="shrink-0 text-primary/70" />
+        <div className="mx-3 mt-3 flex items-center gap-1.5 rounded-lg border border-amber-200/70 bg-amber-50/80 px-2.5 py-1.5 text-[11px] font-medium text-amber-800 dark:border-white/10 dark:bg-white/[0.06] dark:text-white/65">
+          <Sparkles size={11} className="shrink-0 text-amber-500 dark:text-amber-300" />
           Demo modu — veriler periyodik sıfırlanır
         </div>
       )}
@@ -91,7 +97,7 @@ export function Sidebar({
       <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wide text-muted/50">
+            <p className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-wide text-slate-400 dark:text-white/28">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -103,9 +109,7 @@ export function Sidebar({
                   onClick={onNavigate}
                   className={({ isActive }) =>
                     `${navLinkClasses} ${
-                      isActive
-                        ? 'bg-primary/8 text-primary'
-                        : 'text-muted hover:bg-surface-hover hover:text-foreground'
+                      isActive ? activeNavClasses : idleNavClasses
                     }`
                   }
                 >
@@ -120,15 +124,13 @@ export function Sidebar({
         ))}
       </nav>
 
-      <div className="space-y-0.5 border-t border-border p-3">
+      <div className="space-y-0.5 border-t border-slate-200/80 p-3 dark:border-white/10">
         <NavLink
           to="/settings"
           onClick={onNavigate}
           className={({ isActive }) =>
             `${navLinkClasses} ${
-              isActive
-                ? 'bg-primary/8 text-primary'
-                : 'text-muted hover:bg-surface-hover hover:text-foreground'
+              isActive ? activeNavClasses : idleNavClasses
             }`
           }
         >
@@ -143,7 +145,7 @@ export function Sidebar({
               theme: settings.theme === 'dark' ? 'light' : 'dark',
             })
           }
-          className={`${navLinkClasses} w-full text-muted hover:bg-surface-hover hover:text-foreground`}
+          className={`${navLinkClasses} w-full ${idleNavClasses}`}
         >
           <span className="flex items-center gap-2.5">
             {settings.theme === 'dark' ? (
@@ -156,7 +158,7 @@ export function Sidebar({
         </button>
         <button
           onClick={() => logout()}
-          className={`${navLinkClasses} w-full text-muted hover:bg-surface-hover hover:text-foreground`}
+          className={`${navLinkClasses} w-full ${idleNavClasses}`}
         >
           <span className="flex items-center gap-2.5">
             <LogOut size={18} />

@@ -24,6 +24,7 @@ import {
   Input,
   Modal,
   PageHeader,
+  PaginationControls,
   Select,
   Textarea,
 } from '../components/ui';
@@ -46,11 +47,14 @@ const emptyForm: FormState = {
   tags: '',
 };
 
+const NOTES_PAGE_SIZE = 9;
+
 export function NotesPage() {
   const { notes, addNote, updateNote, deleteNote } = useApp();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [view, setView] = useState<'card' | 'list'>('card');
+  const [page, setPage] = useState(1);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -72,6 +76,17 @@ export function NotesPage() {
       return true;
     });
   }, [notes, search, category]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / NOTES_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const paginatedNotes = useMemo(
+    () =>
+      filtered.slice(
+        (safePage - 1) * NOTES_PAGE_SIZE,
+        safePage * NOTES_PAGE_SIZE,
+      ),
+    [filtered, safePage],
+  );
 
   function openAdd() {
     setEditingId(null);
@@ -133,13 +148,19 @@ export function NotesPage() {
             <Input
               placeholder="Notlarda ara..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               className="pl-9"
             />
           </div>
           <Select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setPage(1);
+            }}
             className="max-w-[180px]"
           >
             <option value="all">Tüm kategoriler</option>
@@ -184,7 +205,7 @@ export function NotesPage() {
               : 'space-y-3'
           }
         >
-          {filtered.map((note) => (
+          {paginatedNotes.map((note) => (
             <Card key={note.id}>
               <div className="mb-2 flex items-start justify-between">
                 <div>
@@ -218,6 +239,14 @@ export function NotesPage() {
           ))}
         </div>
       )}
+
+      <PaginationControls
+        page={safePage}
+        pageCount={pageCount}
+        total={filtered.length}
+        pageSize={NOTES_PAGE_SIZE}
+        onPageChange={setPage}
+      />
 
       <Modal
         open={modalOpen}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   ClipboardList,
   LayoutGrid,
@@ -12,7 +12,6 @@ import {
 import { useApp } from '../context/AppContext';
 import type { Word, WordStatus } from '../types';
 import {
-  Badge,
   Button,
   Card,
   ConfirmDialog,
@@ -21,11 +20,12 @@ import {
   Input,
   Modal,
   PageHeader,
+  PaginationControls,
   Select,
   SpeakButton,
   Textarea,
 } from '../components/ui';
-import { wordStatusLabels, wordStatusTone, wordTypeLabels } from '../lib/labels';
+import { wordStatusLabels, wordTypeLabels } from '../lib/labels';
 import { parseBulkWords } from '../lib/bulkImport';
 
 type FormState = {
@@ -44,6 +44,28 @@ const emptyForm: FormState = {
   tags: '',
 };
 
+const WORDS_PAGE_SIZE = 12;
+
+function WordMetaBadge({
+  children,
+  active = false,
+}: {
+  children: ReactNode;
+  active?: boolean;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${
+        active
+          ? 'bg-indigo-500/[0.12] text-indigo-700 ring-1 ring-indigo-500/20 dark:text-indigo-300 dark:ring-indigo-400/20'
+          : 'bg-slate-950/[0.06] text-slate-500 ring-1 ring-slate-950/[0.08] dark:bg-white/[0.06] dark:text-white/58 dark:ring-white/[0.08]'
+      }`}
+    >
+      {children}
+    </span>
+  );
+}
+
 export function WordsPage() {
   const { words, addWord, addWordsBulk, updateWord, deleteWord, toggleFavoriteWord } =
     useApp();
@@ -51,6 +73,7 @@ export function WordsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<WordStatus | 'all'>('all');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
     try {
       return localStorage.getItem('english-study:words-view') === 'list'
@@ -96,6 +119,17 @@ export function WordsPage() {
       return true;
     });
   }, [words, search, statusFilter, favoritesOnly]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / WORDS_PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+  const paginatedWords = useMemo(
+    () =>
+      filtered.slice(
+        (safePage - 1) * WORDS_PAGE_SIZE,
+        safePage * WORDS_PAGE_SIZE,
+      ),
+    [filtered, safePage],
+  );
 
   function openAdd() {
     setEditingId(null);
@@ -197,15 +231,19 @@ export function WordsPage() {
             <Input
               placeholder="Kelime veya anlam ara..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
               className="pl-9"
             />
           </div>
           <Select
             value={statusFilter}
-            onChange={(e) =>
-              setStatusFilter(e.target.value as WordStatus | 'all')
-            }
+            onChange={(e) => {
+              setStatusFilter(e.target.value as WordStatus | 'all');
+              setPage(1);
+            }}
           >
             <option value="all">Tüm durumlar</option>
             {Object.entries(wordStatusLabels).map(([key, label]) => (
@@ -219,7 +257,10 @@ export function WordsPage() {
           <input
             type="checkbox"
             checked={favoritesOnly}
-            onChange={(e) => setFavoritesOnly(e.target.checked)}
+            onChange={(e) => {
+              setFavoritesOnly(e.target.checked);
+              setPage(1);
+            }}
             className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
           />
           Sadece favoriler
@@ -238,8 +279,11 @@ export function WordsPage() {
         />
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((word) => (
-            <Card key={word.id} className="flex flex-col gap-2">
+          {paginatedWords.map((word) => (
+            <Card
+              key={word.id}
+              className="group flex min-h-[184px] flex-col gap-2 transition-all duration-150 hover:-translate-y-0.5 hover:border-indigo-400/30"
+            >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-1">
                   <div>
@@ -254,8 +298,10 @@ export function WordsPage() {
                 </div>
                 <button
                   onClick={() => toggleFavoriteWord(word.id)}
-                  className={`rounded-full p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                    word.favorite ? 'text-amber-500' : 'text-slate-300'
+                  className={`rounded-full p-1.5 transition-colors hover:bg-white/[0.07] ${
+                    word.favorite
+                      ? 'text-amber-400'
+                      : 'text-white/35 hover:text-white/75'
                   }`}
                 >
                   <Star size={16} fill={word.favorite ? 'currentColor' : 'none'} />
@@ -269,39 +315,44 @@ export function WordsPage() {
               )}
 
               <div className="flex flex-wrap items-center gap-1.5">
-                <Badge>{wordTypeLabels[word.type]}</Badge>
-                <Badge tone={wordStatusTone[word.status]}>
+                <WordMetaBadge>{wordTypeLabels[word.type]}</WordMetaBadge>
+                <WordMetaBadge active={word.status !== 'new'}>
                   {wordStatusLabels[word.status]}
-                </Badge>
+                </WordMetaBadge>
                 {word.tags.map((tag) => (
-                  <Badge key={tag} tone="indigo">
+                  <WordMetaBadge key={tag}>
                     #{tag}
-                  </Badge>
+                  </WordMetaBadge>
                 ))}
               </div>
 
-              <div className="mt-2 flex justify-end gap-1 border-t border-slate-100 pt-2 dark:border-zinc-800">
+              <div className="mt-auto flex justify-end gap-1 border-t border-slate-950/[0.08] pt-2 opacity-70 transition-opacity group-hover:opacity-100 dark:border-white/[0.08]">
                 <Button variant="ghost" onClick={() => openEdit(word)}>
                   <Pencil size={14} /> Düzenle
                 </Button>
                 <Button variant="ghost" onClick={() => setDeleteId(word.id)}>
-                  <Trash2 size={14} className="text-red-500" />
+                  <Trash2
+                    size={14}
+                    className="text-slate-400 hover:text-red-500 dark:text-white/45 dark:hover:text-red-300"
+                  />
                 </Button>
               </div>
             </Card>
           ))}
         </div>
       ) : (
-        <div className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
-          {filtered.map((word) => (
+        <div className="overflow-hidden rounded-lg border border-border/80 bg-surface/88 shadow-[0_16px_45px_rgba(15,23,42,0.08)] backdrop-blur">
+          {paginatedWords.map((word) => (
             <div
               key={word.id}
-              className="flex flex-wrap items-center gap-3 px-4 py-3"
+              className="flex flex-wrap items-center gap-3 border-b border-slate-950/[0.08] px-4 py-3 last:border-b-0 dark:border-white/[0.08]"
             >
               <button
                 onClick={() => toggleFavoriteWord(word.id)}
-                className={`shrink-0 rounded-full p-1 hover:bg-slate-100 dark:hover:bg-slate-800 ${
-                  word.favorite ? 'text-amber-500' : 'text-slate-300'
+                className={`shrink-0 rounded-full p-1 transition-colors hover:bg-white/[0.07] ${
+                  word.favorite
+                    ? 'text-amber-400'
+                    : 'text-white/35 hover:text-white/75'
                 }`}
               >
                 <Star size={16} fill={word.favorite ? 'currentColor' : 'none'} />
@@ -320,14 +371,14 @@ export function WordsPage() {
               </div>
 
               <div className="hidden flex-wrap items-center gap-1.5 sm:flex">
-                <Badge>{wordTypeLabels[word.type]}</Badge>
-                <Badge tone={wordStatusTone[word.status]}>
+                <WordMetaBadge>{wordTypeLabels[word.type]}</WordMetaBadge>
+                <WordMetaBadge active={word.status !== 'new'}>
                   {wordStatusLabels[word.status]}
-                </Badge>
+                </WordMetaBadge>
                 {word.tags.map((tag) => (
-                  <Badge key={tag} tone="indigo">
+                  <WordMetaBadge key={tag}>
                     #{tag}
-                  </Badge>
+                  </WordMetaBadge>
                 ))}
               </div>
 
@@ -336,13 +387,24 @@ export function WordsPage() {
                   <Pencil size={14} />
                 </Button>
                 <Button variant="ghost" onClick={() => setDeleteId(word.id)}>
-                  <Trash2 size={14} className="text-red-500" />
+                  <Trash2
+                    size={14}
+                    className="text-slate-400 hover:text-red-500 dark:text-white/45 dark:hover:text-red-300"
+                  />
                 </Button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <PaginationControls
+        page={safePage}
+        pageCount={pageCount}
+        total={filtered.length}
+        pageSize={WORDS_PAGE_SIZE}
+        onPageChange={setPage}
+      />
 
       <Modal
         open={modalOpen}
